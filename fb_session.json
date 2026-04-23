@@ -1,0 +1,45 @@
+{
+  "cookies": [
+    {
+      "name": "datr",
+      "value": "KwXaaS5ig7RCH-nICT9hZ48U",
+      "domain": ".facebook.com",
+      "path": "/",
+      "expires": 1810455851.582131,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "fr",
+      "value": "0wWVGhBheQ9SdLKWa..Bp2gUr..AAA.0.0.Bp2gUr.AWcME9WVcDG2CLL5fJuR-xLlYMA",
+      "domain": ".facebook.com",
+      "path": "/",
+      "expires": 1783671851.582231,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "sb",
+      "value": "KwXaaVX8Lhv7jgaAz5W2UvRT",
+      "domain": ".facebook.com",
+      "path": "/",
+      "expires": 1810455851.582244,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "wd",
+      "value": "1280x720",
+      "domain": ".facebook.com",
+      "path": "/",
+      "expires": 1776500652,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    }
+  ],
+  "last_updated": "2026-04-11 08:24:13"
+}

@@ -1,0 +1,11 @@
+{
+  "proxy": {
+    "type": "socks5",
+    "server": "gw.dataimpulse.com",
+    "port": 10000,
+    "username": "f8f0213b1920136988b4__cr.th",
+    "password": "f6c29165ec2eeb7a"
+  },
+  "status": "active",
+  "note": "Dataimpulse Proxy - SOCKS5"
+}

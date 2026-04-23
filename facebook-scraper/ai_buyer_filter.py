@@ -1,0 +1,186 @@
+#!/usr/bin/env python3
+"""
+AI Buyer Filter - Ultra Accurate (v4)
+=====================================
+ใช้ Keyword วิเคราะห์โพสจาก Facebook ให้แม่นที่สุด
+
+4 Categories (ตาม Tibodin Spec):
+- 🔥 HIGH (9-10): สนใจ/ซื้อ - ปิดการขายทันที
+- 🟢 MEDIUM (7-8): สนใจโซล่าเซลล์ - มุ่งหวังสูง
+- 🟡 EVAL (5-6): กำลังพิจารณา - เปรียบเทียบราคา
+- 🔵 COLD (1-4): สอบถาม - หาความรู้/ข้อมูล
+"""
+
+import sys
+sys.path.insert(0, '.')
+
+import json, os, re
+from datetime import datetime, timedelta
+
+THAI_OFFSET = timedelta(hours=7)
+LEADS_DIR = "/root/.openclaw/workspace/facebook-scraper/leads"
+PENDING_DIR = "/root/.openclaw/workspace/facebook-scraper/pending"
+
+# ==================== BUYER SCORING (Ultra Accurate v4) ====================
+def ultra_analyze(post_text, post_url, group_id):
+    """
+    วิเคราะห์แบบ Ultra Accurate v4 โดยใช้หลักการ:
+    1. ถ้ามีคำถาม/ขอคำแนะนำ → ให้เป็น COLD (1-4) เสมอ (ถ้าไม่มี HIGH intent)
+    2. ถ้าเป็นรีวิวใบเสนอราคา → ให้เป็น EVAL (5-6)
+    3. ถ้ามี HIGH intent signals → HIGH (9-10)
+    
+    🔥 HIGH (9-10): สนใจ/ซื้อ - ปิดการขายทันที
+    🟢 MEDIUM (7-8): สนใจโซล่าเซลล์ - มุ่งหวังสูง
+    🟡 EVAL (5-6): กำลังพิจารณา - เปรียบเทียบราคา
+    🔵 COLD (1-4): สอบถาม - หาความรู้/ข้อมูล
+    """
+    
+    text = post_text.strip()
+    lower = text.lower()
+    
+    # ==================== STEP 1: Check for QUESTIONS/COLD first ====================
+    # ถ้ามีคำเหล่านี้ → ให้เป็น COLD เสมอ (ถามเพื่อเก็บข้อมูล/ขอความเห็น)
+    cold_phrases = [
+        'ขอสอบถาม', 'สอบถามผู้รู้', 'ช่วยแนะนำ', 'แนะนำหน่อย', 'ดีไหม', 
+        'เป็นไง', 'ควรเลือก', 'เลือกยังไง', 'ช่วยดู', 'ช่วยตรวจ', 'ช่วยเช็ค',
+        'ขอดู', 'ดูหน่อย', 'มีดูไหม', 'รีวิว', 'ขอรีวิว',
+        'ใครเคย', 'มีใครรู้บ้าง', 'วิธีการ', 'ขั้นตอน',
+        'ขอคำแนะนำ', 'ขอความเห็น', 'ขอคำปรึกษา',
+        'สอบถาม', 'รบกวนถาม', 'อยากสอบถาม',
+        'ต้องขออนุญาตไหม'
+    ]
+    
+    for phrase in cold_phrases:
+        if phrase in lower:
+            # ตรวจสอบว่ามี HIGH intent หรือไม่ (ถ้ามี → ยังเป็น HIGH)
+            has_high = any(h in lower for h in [
+                'เอาจริง', 'ตกลงติด', 'มัดจำ', 'โอนจอง', 'พร้อมติด', 'พร้อมซื้อ',
+                'ติดด่วน', 'ตัดสินใจ', 'จะติด', 'จะซื้อ', 'สนใจ++', 'สนใจมาก'
+            ])
+            if has_high:
+                continue  # ข้ามไป check HIGH
+            return {
+                'is_lead': True,
+                'score': 3,
+                'reason': "🔵 สอบถาม",
+                'intent_type': "buyer",
+                'all_reasons': ["🔵 " + phrase]
+            }
+    
+    # ==================== STEP 2: Check HIGH intent ====================
+    high_intent = [
+        # ตัดสินใจ/นัด
+        'เอาจริง', 'ตกลงติด', 'มัดจำ', 'โอนจอง',
+        'มาดูหน้างาน', 'ขอคิวติดตั้ง', 'ขอเบอร์ติดต่อ', 'ขอพิกัดร้าน', 'นัดวัน',
+        # สัญลักษณ์
+        'สนใจ++', 'สนคับ', 'สนค่ะ', '+1', 'สนใจมาก',
+        # ตามหา
+        'ตามหาบริษัท', 'หาสินค้า', 'หาแผง', 'หาช่าง', 'หาร้าน', 'แนะนำบริษัทหน่อย',
+        # อยาก/พร้อม
+        'พร้อมติด', 'พร้อมซื้อ', 'ตัดสินใจ', 'จะติด', 'จะซื้อ', 'ติดด่วน', 'อยากจบงาน'
+    ]
+    
+    for phrase in high_intent:
+        if phrase in lower:
+            return {
+                'is_lead': True,
+                'score': 9,
+                'reason': "🔥 สนใจ/ซื้อ",
+                'intent_type': "buyer",
+                'all_reasons': ["🔥 " + phrase]
+            }
+    
+    # ==================== STEP 3: Check MEDIUM intent ====================
+    medium_intent = [
+        # เปรียบเทียบ
+        'เจ้าอื่น', 'เทียบกับ', 'ออนกริด', 'ไฮบริด', 'micro inverter', 'battery', 'กันย้อน',
+        # ยี่ห้อ
+        'huawei', 'sungrow', 'longi', 'growatt', 'fronius', 'jinko', 'trina',
+        # ความคุ้มค่า
+        'คืนทุนกี่ปี', 'ลดค่าไฟ', 'คุ้มไหม', 'ผ่อนได้กี่เดือน',
+        # สถานะ/สนใจ
+        'สนใจติด', 'ต้องการติด', 'ต้องการซื้อ', 'ดูไว้อยู่', 'กำลังเลือก', 'ยังลังเล'
+    ]
+    
+    for phrase in medium_intent:
+        if phrase in lower:
+            return {
+                'is_lead': True,
+                'score': 7,
+                'reason': "🟢 สนใจโซล่าเซลล์",
+                'intent_type': "buyer",
+                'all_reasons': ["🟢 " + phrase]
+            }
+    
+    # ==================== STEP 4: Check EVAL/SPEC ====================
+    eval_intent = [
+        # อุปกรณ์/Spec
+        'แผง n-type', 'แผง p-type', 'n-type', 'p-type',
+        'inverter', 'อินเวอร์เตอร์', 'ไมโครอินเวอร์เตอร์',
+        'แบตเตอรี่', 'ตู้ไฟ', 'สมาร์ทมิเตอร์',
+        # เงื่อนไขบ้าน
+        'หลังคาซีแพค', 'หลังคาเมทัลชีท', 'บ้านเดี่ยว', 'ทาวน์โฮม',
+        'แอร์กี่ตัว', 'ตู้เย็นกี่เครื่อง', 'ชาร์จรถไฟฟ้า', 'ev',
+        'ไฟตกบ่อย', 'พื้นที่น้อย',
+        # ราคา
+        'กี่บาท', 'งบเท่าไหร่', 'ขอราคา', 'ราคาเท่าไหร่', 'ค่าติดตั้ง', 'ใบเสนอราคา'
+    ]
+    
+    for phrase in eval_intent:
+        if phrase in lower:
+            return {
+                'is_lead': True,
+                'score': 5,
+                'reason': "🟡 กำลังพิจารณา",
+                'intent_type': "buyer",
+                'all_reasons': ["🟡 " + phrase]
+            }
+    
+    # ==================== STEP 5: Check SELLER ====================
+    seller_phrases = [
+        'ขาย', 'ปล่อย', 'ลงขาย', 'ประกาศขาย', 'โฆษณาขาย',
+        'พร้อมส่ง', 'พร้อมติดตั้ง', 'ติดตั้งฟรี',
+        'ด่วน! ค่าไฟ', 'ค่าไฟรอบใหม่', 'ค่า ft', 'มติ กกพ.',
+        'ตัวแทนจำหน่าย', 'จำหน่าย', 'ตัวแทน', 'รีบจับจอง',
+        'ขนกอง', 'กองทัพ', 'แผงมา', 'มาไว้ที่นี่',
+        'รับสมัครแอดมิน', 'ทำงานออนไลน์', 'ฝากร้าน',
+        'โปรโมชั่น', 'ส่วนลด', 'ลดราคา'
+    ]
+    
+    for phrase in seller_phrases:
+        if phrase in lower:
+            return {
+                'is_lead': False,
+                'score': 0,
+                'reason': "❌ โฆษณาขาย",
+                'intent_type': "seller",
+                'all_reasons': ["❌ " + phrase]
+            }
+    
+    # ==================== STEP 6: Nothing matched ====================
+    return {
+        'is_lead': False,
+        'score': 0,
+        'reason': "ไม่มี signals",
+        'intent_type': "unknown",
+        'all_reasons': []
+    }
+
+def extract_contact(post_text):
+    """ดึงข้อมูลติดต่อจากโพส"""
+    contacts = []
+    text = post_text.lower()
+    
+    import re
+    phone_pattern = r'[\d]{9,10}'
+    phones = re.findall(phone_pattern, text)
+    for phone in phones:
+        if len(phone) >= 9:
+            contacts.append('โทร: ' + phone)
+    
+    fb_pattern = r'facebook\.com/(\w+)'
+    fb_links = re.findall(fb_pattern, text)
+    for fb in fb_links[:2]:
+        contacts.append('FB: ' + fb)
+    
+    return contacts

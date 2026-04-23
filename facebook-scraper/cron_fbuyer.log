@@ -1,0 +1,465 @@
+
+========== RUN 1: 2026-04-22 08:44:46 (5/10 min) ==========
+============================================================
+🚀 FACEBOOK SCRAPER - HYBRID + MiniMax AI
+============================================================
+[15:44:46] 📋 Groups: 6
+[15:44:46] 👥 Workers: 3
+[15:44:46] 🔄 Browser reuse limit: 2
+[15:44:46] ⏳ Delay: 2-5 seconds
+[15:44:46] 🧠 AI: JSON format - is_lead, score, reason
+============================================================
+[15:44:46] ✅ Loaded 5 cookies
+[15:44:46] 📋 Queue filled with 6 groups
+[15:44:46] 📁 Existing leads: 47 URLs
+[15:44:46] 🚀 Starting 3 workers...
+[15:44:46] [Worker-1] 🚀 Worker 1 starting...
+[15:44:47] [Worker-2] 🚀 Worker 2 starting...
+[15:44:48] [Worker-3] 🚀 Worker 3 starting...
+[15:44:50] [Worker-1] 📂 Loading group: 1925997401002801
+[15:44:50] [Worker-2] 📂 Loading group: 383849116272497
+[15:44:51] [Worker-3] 📂 Loading group: 2317142971864047
+[15:44:54] [Worker-1]    📜 Scroll 1/3...
+[15:44:56] [Worker-2]    📜 Scroll 1/3...
+[15:44:57] [Worker-3]    📜 Scroll 1/3...
+[15:44:57] [Worker-1]       📰 Found 0 posts
+[15:44:59] [Worker-2]       📰 Found 3 posts
+[15:45:00] [Worker-3]       📰 Found 3 posts
+[15:45:01] [Worker-1]    📜 Scroll 2/3...
+[15:45:03] [Worker-2]    📜 Scroll 2/3...
+[15:45:05] [Worker-1]       📰 Found 0 posts
+[15:45:06] [Worker-2]       📰 Found 3 posts
+[15:45:09] [Worker-1]    📜 Scroll 3/3...
+[15:45:09] [Worker-2]    📜 Scroll 3/3...
+[15:45:13] [Worker-2]       📰 Found 3 posts
+[15:45:14] [Worker-1]       📰 Found 0 posts
+[15:45:21] [Worker-3]    📜 Scroll 2/3...
+[15:45:24] [Worker-1] 📂 Loading group: thaisolarcell
+[15:45:24] [Worker-2] 📂 Loading group: 1671213103178339
+[15:45:25] [Worker-3]       📰 Found 3 posts
+[15:45:28] [Worker-3]    📜 Scroll 3/3...
+[15:45:29] [Worker-2]    📜 Scroll 1/3...
+[15:45:30] [Worker-1]    📜 Scroll 1/3...
+[15:45:31] [Worker-3]       📰 Found 3 posts
+[15:45:32] [Worker-2]       📰 Found 3 posts
+[15:45:34] [Worker-1]       📰 Found 3 posts
+[15:45:39] [Worker-3] 📂 Loading group: 429829328127055
+[15:45:45] [Worker-3]    📜 Scroll 1/3...
+[15:45:45] [Worker-2]    📜 Scroll 2/3...
+[15:45:47] [Worker-2]       📰 Found 3 posts
+[15:45:49] [Worker-3]       📰 Found 3 posts
+[15:45:50] [Worker-2]    📜 Scroll 3/3...
+[15:45:54] [Worker-2]       📰 Found 3 posts
+[15:46:02] [Worker-1]    📜 Scroll 2/3...
+[15:46:02] [Worker-2] 🏁 Worker 2 queue empty, exiting
+[15:46:02] [Worker-2] 🏁 Worker 2 done. Total leads: 0
+[15:46:06] [Worker-1]       📰 Found 3 posts
+[15:46:10] [Worker-1]    📜 Scroll 3/3...
+[15:46:11] [Worker-3]    📜 Scroll 2/3...
+[15:46:12] [Worker-1]       📰 Found 3 posts
+[15:46:13] [Worker-3]       📰 Found 3 posts
+[15:46:16] [Worker-3]    📜 Scroll 3/3...
+[15:46:20] [Worker-3]       📰 Found 3 posts
+[15:46:22] [Worker-1] 🏁 Worker 1 queue empty, exiting
+[15:46:22] [Worker-1] 🏁 Worker 1 done. Total leads: 0
+[15:46:26] [Worker-3] 🏁 Worker 3 queue empty, exiting
+[15:46:26] [Worker-3] 🏁 Worker 3 done. Total leads: 0
+============================================================
+✅ COMPLETE!
+📊 Leads found this run: 0
+📁 Total in leads folder: 55
+🏁 Groups completed: 6
+💡 Run /wbuyer to export CSV
+============================================================
+
+========== RUN 2: 2026-04-22 08:51:26 (10/10 min) ==========
+============================================================
+🚀 FACEBOOK SCRAPER - HYBRID + MiniMax AI
+============================================================
+[15:51:27] 📋 Groups: 6
+[15:51:27] 👥 Workers: 3
+[15:51:27] 🔄 Browser reuse limit: 2
+[15:51:27] ⏳ Delay: 2-5 seconds
+[15:51:27] 🧠 AI: JSON format - is_lead, score, reason
+============================================================
+[15:51:27] ✅ Loaded 5 cookies
+[15:51:27] 📋 Queue filled with 6 groups
+[15:51:27] 📁 Existing leads: 47 URLs
+[15:51:27] 🚀 Starting 3 workers...
+[15:51:27] [Worker-1] 🚀 Worker 1 starting...
+[15:51:28] [Worker-2] 🚀 Worker 2 starting...
+[15:51:29] [Worker-3] 🚀 Worker 3 starting...
+[15:51:30] [Worker-1] 📂 Loading group: 1925997401002801
+[15:51:30] [Worker-2] 📂 Loading group: 383849116272497
+[15:51:32] [Worker-3] 📂 Loading group: 2317142971864047
+[15:51:34] [Worker-1]    📜 Scroll 1/3...
+[15:51:35] [Worker-2]    📜 Scroll 1/3...
+[15:51:36] [Worker-1]       📰 Found 0 posts
+[15:51:39] [Worker-2]       📰 Found 3 posts
+[15:51:39] [Worker-3]    📜 Scroll 1/3...
+[15:51:39] [Worker-1]    📜 Scroll 2/3...
+[15:51:42] [Worker-1]       📰 Found 0 posts
+[15:51:42] [Worker-2]    📜 Scroll 2/3...
+[15:51:44] [Worker-3]       📰 Found 4 posts
+[15:51:45] [Worker-1]    📜 Scroll 3/3...
+[15:51:47] [Worker-2]       📰 Found 3 posts
+[15:51:50] [Worker-1]       📰 Found 0 posts
+[15:51:51] [Worker-2]    📜 Scroll 3/3...
+[15:51:56] [Worker-2]       📰 Found 3 posts
+[15:51:58] [Worker-1] 📂 Loading group: thaisolarcell
+[15:52:01] [Worker-1]    📜 Scroll 1/3...
+[15:52:03] [Worker-2] 📂 Loading group: 1671213103178339
+[15:52:05] [Worker-1]       📰 Found 3 posts
+[15:52:08] [Worker-3]    📜 Scroll 2/3...
+[15:52:09] [Worker-2]    📜 Scroll 1/3...
+[15:52:11] [Worker-2]       📰 Found 3 posts
+[15:52:12] [Worker-3]       📰 Found 4 posts
+[15:52:16] [Worker-3]    📜 Scroll 3/3...
+[15:52:21] [Worker-3]       📰 Found 4 posts
+[15:52:27] [Worker-2]    📜 Scroll 2/3...
+[15:52:31] [Worker-3] 📂 Loading group: 429829328127055
+[15:52:31] [Worker-2]       📰 Found 3 posts
+[15:52:34] [Worker-1]    📜 Scroll 2/3...
+[15:52:36] [Worker-2]    📜 Scroll 3/3...
+[15:52:36] [Worker-3]    📜 Scroll 1/3...
+[15:52:37] [Worker-1]       📰 Found 3 posts
+[15:52:38] [Worker-2]       📰 Found 3 posts
+[15:52:39] [Worker-3]       📰 Found 3 posts
+[15:52:40] [Worker-1]    📜 Scroll 3/3...
+[15:52:42] [Worker-1]       📰 Found 3 posts
+[15:52:49] [Worker-2] 🏁 Worker 2 queue empty, exiting
+[15:52:49] [Worker-2] 🏁 Worker 2 done. Total leads: 0
+[15:52:52] [Worker-1] 🏁 Worker 1 queue empty, exiting
+[15:52:52] [Worker-1] 🏁 Worker 1 done. Total leads: 0
+[15:52:59] [Worker-3]    📜 Scroll 2/3...
+[15:53:03] [Worker-3]       📰 Found 3 posts
+[15:53:08] [Worker-3]    📜 Scroll 3/3...
+[15:53:11] [Worker-3]       📰 Found 3 posts
+[15:53:18] [Worker-3] 🏁 Worker 3 queue empty, exiting
+[15:53:18] [Worker-3] 🏁 Worker 3 done. Total leads: 0
+============================================================
+✅ COMPLETE!
+📊 Leads found this run: 0
+📁 Total in leads folder: 55
+🏁 Groups completed: 6
+💡 Run /wbuyer to export CSV
+============================================================
+
+========== FINAL: 2026-04-22 08:53:18 ==========
+Running /wbuyer to export...
+[15:53:19] ==================================================
+[15:53:19] 📊 EXPORT LEADS TO CSV
+[15:53:19] ==================================================
+[15:53:19] ✅ Exported 55 leads to CSV
+[15:53:19] 📁 /root/.openclaw/workspace/facebook-scraper/csv_exports/leads_20260422_155319.csv
+[15:53:19] 📋 Columns: No, Post URL, Message, Group, PostDate, Score, Reason, Contact, ScrapedAt
+[15:53:21] ✅ Sent to Telegram!
+[15:53:21] ==================================================
+
+========== COMPLETED: 2026-04-22 08:53:21 ==========
+
+========== RUN 1: 2026-04-22 09:23:41 (5/20 min) ==========
+============================================================
+🚀 FACEBOOK SCRAPER - HYBRID + MiniMax AI
+============================================================
+[16:23:41] 📋 Groups: 6
+[16:23:41] 👥 Workers: 3
+[16:23:41] 🔄 Browser reuse limit: 2
+[16:23:41] ⏳ Delay: 2-5 seconds
+[16:23:41] 🧠 AI: JSON format - is_lead, score, reason
+============================================================
+[16:23:41] ✅ Loaded 5 cookies
+[16:23:41] 📋 Queue filled with 6 groups
+[16:23:41] 📁 Existing leads: 47 URLs
+[16:23:41] 🚀 Starting 3 workers...
+[16:23:41] [Worker-1] 🚀 Worker 1 starting...
+[16:23:42] [Worker-2] 🚀 Worker 2 starting...
+[16:23:43] [Worker-3] 🚀 Worker 3 starting...
+[16:23:44] [Worker-1] 📂 Loading group: 1925997401002801
+[16:23:45] [Worker-2] 📂 Loading group: 383849116272497
+[16:23:47] [Worker-3] 📂 Loading group: 2317142971864047
+[16:23:50] [Worker-2]    📜 Scroll 1/3...
+[16:23:51] [Worker-3]    📜 Scroll 1/3...
+[16:23:51] [Worker-1]    📜 Scroll 1/3...
+[16:23:53] [Worker-2]       📰 Found 0 posts
+[16:23:53] [Worker-3]       📰 Found 0 posts
+[16:23:54] [Worker-1]       📰 Found 0 posts
+[16:23:56] [Worker-3]    📜 Scroll 2/3...
+[16:23:56] [Worker-2]    📜 Scroll 2/3...
+[16:23:57] [Worker-1]    📜 Scroll 2/3...
+[16:24:00] [Worker-3]       📰 Found 0 posts
+[16:24:00] [Worker-2]       📰 Found 0 posts
+[16:24:02] [Worker-1]       📰 Found 0 posts
+[16:24:04] [Worker-2]    📜 Scroll 3/3...
+[16:24:04] [Worker-3]    📜 Scroll 3/3...
+[16:24:06] [Worker-1]    📜 Scroll 3/3...
+[16:24:07] [Worker-2]       📰 Found 0 posts
+[16:24:08] [Worker-3]       📰 Found 0 posts
+[16:24:09] [Worker-1]       📰 Found 0 posts
+[16:24:17] [Worker-3] 📂 Loading group: thaisolarcell
+[16:24:17] [Worker-2] 📂 Loading group: 1671213103178339
+[16:24:20] [Worker-1] 📂 Loading group: 429829328127055
+[16:24:22] [Worker-2]    📜 Scroll 1/3...
+[16:24:23] [Worker-3]    📜 Scroll 1/3...
+[16:24:24] [Worker-1]    📜 Scroll 1/3...
+[16:24:26] [Worker-3]       📰 Found 0 posts
+[16:24:27] [Worker-2]       📰 Found 0 posts
+[16:24:29] [Worker-1]       📰 Found 0 posts
+[16:24:31] [Worker-2]    📜 Scroll 2/3...
+[16:24:31] [Worker-3]    📜 Scroll 2/3...
+[16:24:32] [Worker-1]    📜 Scroll 2/3...
+[16:24:33] [Worker-2]       📰 Found 0 posts
+[16:24:34] [Worker-1]       📰 Found 0 posts
+[16:24:36] [Worker-3]       📰 Found 0 posts
+[16:24:38] [Worker-1]    📜 Scroll 3/3...
+[16:24:38] [Worker-2]    📜 Scroll 3/3...
+[16:24:39] [Worker-3]    📜 Scroll 3/3...
+[16:24:41] [Worker-2]       📰 Found 0 posts
+[16:24:41] [Worker-3]       📰 Found 0 posts
+[16:24:41] [Worker-1]       📰 Found 0 posts
+[16:24:48] [Worker-3] 🏁 Worker 3 queue empty, exiting
+[16:24:48] [Worker-3] 🏁 Worker 3 done. Total leads: 0
+[16:24:50] [Worker-2] 🏁 Worker 2 queue empty, exiting
+[16:24:50] [Worker-2] 🏁 Worker 2 done. Total leads: 0
+[16:24:51] [Worker-1] 🏁 Worker 1 queue empty, exiting
+[16:24:51] [Worker-1] 🏁 Worker 1 done. Total leads: 0
+============================================================
+✅ COMPLETE!
+📊 Leads found this run: 0
+📁 Total in leads folder: 55
+🏁 Groups completed: 6
+💡 Run /wbuyer to export CSV
+============================================================
+
+========== RUN 2: 2026-04-22 09:29:52 (10/20 min) ==========
+============================================================
+🚀 FACEBOOK SCRAPER - HYBRID + MiniMax AI
+============================================================
+[16:29:52] 📋 Groups: 6
+[16:29:52] 👥 Workers: 3
+[16:29:52] 🔄 Browser reuse limit: 2
+[16:29:52] ⏳ Delay: 2-5 seconds
+[16:29:52] 🧠 AI: JSON format - is_lead, score, reason
+============================================================
+[16:29:52] ✅ Loaded 5 cookies
+[16:29:52] 📋 Queue filled with 6 groups
+[16:29:52] 📁 Existing leads: 47 URLs
+[16:29:52] 🚀 Starting 3 workers...
+[16:29:52] [Worker-1] 🚀 Worker 1 starting...
+[16:29:53] [Worker-2] 🚀 Worker 2 starting...
+[16:29:54] [Worker-3] 🚀 Worker 3 starting...
+[16:29:55] [Worker-1] 📂 Loading group: 1925997401002801
+[16:29:56] [Worker-2] 📂 Loading group: 383849116272497
+[16:29:57] [Worker-3] 📂 Loading group: 2317142971864047
+[16:30:00] [Worker-3]    📜 Scroll 1/3...
+[16:30:01] [Worker-2]    📜 Scroll 1/3...
+[16:30:01] [Worker-1]    📜 Scroll 1/3...
+[16:30:03] [Worker-3]       📰 Found 0 posts
+[16:30:03] [Worker-2]       📰 Found 0 posts
+[16:30:05] [Worker-1]       📰 Found 0 posts
+[16:30:07] [Worker-3]    📜 Scroll 2/3...
+[16:30:07] [Worker-2]    📜 Scroll 2/3...
+[16:30:10] [Worker-1]    📜 Scroll 2/3...
+[16:30:10] [Worker-2]       📰 Found 0 posts
+[16:30:11] [Worker-3]       📰 Found 0 posts
+[16:30:13] [Worker-2]    📜 Scroll 3/3...
+[16:30:14] [Worker-1]       📰 Found 0 posts
+[16:30:16] [Worker-3]    📜 Scroll 3/3...
+[16:30:17] [Worker-1]    📜 Scroll 3/3...
+[16:30:17] [Worker-2]       📰 Found 0 posts
+[16:30:18] [Worker-3]       📰 Found 0 posts
+[16:30:22] [Worker-1]       📰 Found 0 posts
+[16:30:26] [Worker-2] 📂 Loading group: thaisolarcell
+[16:30:29] [Worker-3] 📂 Loading group: 1671213103178339
+[16:30:31] [Worker-2]    📜 Scroll 1/3...
+[16:30:32] [Worker-1] 📂 Loading group: 429829328127055
+[16:30:33] [Worker-3]    📜 Scroll 1/3...
+[16:30:33] [Worker-2]       📰 Found 4 posts
+[16:30:36] [Worker-1]    📜 Scroll 1/3...
+[16:30:37] [Worker-3]       📰 Found 0 posts
+[16:30:38] [Worker-1]       📰 Found 0 posts
+[16:30:40] [Worker-2]       🟢 LEAD | score:8 | ผู้โพสต์กำลังหาช่างเพื่อติดตั้งระบบ solar Hybrid ขนาด 6KW และแบตเตอรี่ 16kw มีความต้องการชัดเจน ระบุสเปคและพื้นที่ในชลบุรี แสดงว่าพร้อมที่จะซื้อและติดตั้งระบบ solar สูง
+[16:30:41] [Worker-3]    📜 Scroll 2/3...
+[16:30:43] [Worker-1]    📜 Scroll 2/3...
+[16:30:44] [Worker-3]       📰 Found 0 posts
+[16:30:46] [Worker-2]    📜 Scroll 2/3...
+[16:30:47] [Worker-1]       📰 Found 0 posts
+[16:30:48] [Worker-3]    📜 Scroll 3/3...
+[16:30:49] [Worker-2]       📰 Found 4 posts
+[16:30:52] [Worker-1]    📜 Scroll 3/3...
+[16:30:52] [Worker-3]       📰 Found 0 posts
+[16:30:54] [Worker-2]    📜 Scroll 3/3...
+[16:30:54] [Worker-1]       📰 Found 0 posts
+[16:30:58] [Worker-2]       📰 Found 4 posts
+[16:31:00] [Worker-3] 🏁 Worker 3 queue empty, exiting
+[16:31:00] [Worker-3] 🏁 Worker 3 done. Total leads: 0
+[16:31:02] [Worker-1] 🏁 Worker 1 queue empty, exiting
+[16:31:02] [Worker-1] 🏁 Worker 1 done. Total leads: 0
+[16:31:10] [Worker-2] 🏁 Worker 2 queue empty, exiting
+[16:31:10] [Worker-2] 🏁 Worker 2 done. Total leads: 1
+============================================================
+✅ COMPLETE!
+📊 Leads found this run: 1
+📁 Total in leads folder: 56
+🏁 Groups completed: 6
+💡 Run /wbuyer to export CSV
+============================================================
+
+========== RUN 3: 2026-04-22 09:36:11 (15/20 min) ==========
+============================================================
+🚀 FACEBOOK SCRAPER - HYBRID + MiniMax AI
+============================================================
+[16:36:12] 📋 Groups: 6
+[16:36:12] 👥 Workers: 3
+[16:36:12] 🔄 Browser reuse limit: 2
+[16:36:12] ⏳ Delay: 2-5 seconds
+[16:36:12] 🧠 AI: JSON format - is_lead, score, reason
+============================================================
+[16:36:12] ✅ Loaded 5 cookies
+[16:36:12] 📋 Queue filled with 6 groups
+[16:36:12] 📁 Existing leads: 48 URLs
+[16:36:12] 🚀 Starting 3 workers...
+[16:36:12] [Worker-1] 🚀 Worker 1 starting...
+[16:36:13] [Worker-2] 🚀 Worker 2 starting...
+[16:36:14] [Worker-3] 🚀 Worker 3 starting...
+[16:36:14] [Worker-1] 📂 Loading group: 1925997401002801
+[16:36:15] [Worker-2] 📂 Loading group: 383849116272497
+[16:36:16] [Worker-3] 📂 Loading group: 2317142971864047
+[16:36:19] [Worker-1]    📜 Scroll 1/3...
+[16:36:21] [Worker-2]    📜 Scroll 1/3...
+[16:36:22] [Worker-3]    📜 Scroll 1/3...
+[16:36:23] [Worker-1]       📰 Found 0 posts
+[16:36:25] [Worker-2]       📰 Found 0 posts
+[16:36:25] [Worker-1]    📜 Scroll 2/3...
+[16:36:27] [Worker-3]       📰 Found 0 posts
+[16:36:28] [Worker-2]    📜 Scroll 2/3...
+[16:36:29] [Worker-3]    📜 Scroll 2/3...
+[16:36:30] [Worker-1]       📰 Found 0 posts
+[16:36:32] [Worker-2]       📰 Found 0 posts
+[16:36:33] [Worker-3]       📰 Found 0 posts
+[16:36:34] [Worker-1]    📜 Scroll 3/3...
+[16:36:36] [Worker-2]    📜 Scroll 3/3...
+[16:36:38] [Worker-3]    📜 Scroll 3/3...
+[16:36:38] [Worker-1]       📰 Found 0 posts
+[16:36:40] [Worker-2]       📰 Found 0 posts
+[16:36:40] [Worker-3]       📰 Found 0 posts
+[16:36:45] [Worker-1] 📂 Loading group: thaisolarcell
+[16:36:49] [Worker-1]    📜 Scroll 1/3...
+[16:36:49] [Worker-3] 📂 Loading group: 1671213103178339
+[16:36:51] [Worker-2] 📂 Loading group: 429829328127055
+[16:36:51] [Worker-1]       📰 Found 0 posts
+[16:36:53] [Worker-3]    📜 Scroll 1/3...
+[16:36:54] [Worker-1]    📜 Scroll 2/3...
+[16:36:54] [Worker-2]    📜 Scroll 1/3...
+[16:36:56] [Worker-1]       📰 Found 0 posts
+[16:36:56] [Worker-3]       📰 Found 0 posts
+[16:36:57] [Worker-2]       📰 Found 0 posts
+[16:37:00] [Worker-1]    📜 Scroll 3/3...
+[16:37:01] [Worker-3]    📜 Scroll 2/3...
+[16:37:02] [Worker-2]    📜 Scroll 2/3...
+[16:37:03] [Worker-3]       📰 Found 0 posts
+[16:37:03] [Worker-1]       📰 Found 0 posts
+[16:37:06] [Worker-3]    📜 Scroll 3/3...
+[16:37:07] [Worker-2]       📰 Found 0 posts
+[16:37:09] [Worker-3]       📰 Found 0 posts
+[16:37:11] [Worker-2]    📜 Scroll 3/3...
+[16:37:13] [Worker-1] 🏁 Worker 1 queue empty, exiting
+[16:37:13] [Worker-1] 🏁 Worker 1 done. Total leads: 0
+[16:37:15] [Worker-2]       📰 Found 0 posts
+[16:37:19] [Worker-3] 🏁 Worker 3 queue empty, exiting
+[16:37:19] [Worker-3] 🏁 Worker 3 done. Total leads: 0
+[16:37:25] [Worker-2] 🏁 Worker 2 queue empty, exiting
+[16:37:25] [Worker-2] 🏁 Worker 2 done. Total leads: 0
+============================================================
+✅ COMPLETE!
+📊 Leads found this run: 0
+📁 Total in leads folder: 56
+🏁 Groups completed: 6
+💡 Run /wbuyer to export CSV
+============================================================
+
+========== RUN 4: 2026-04-22 09:42:26 (20/20 min) ==========
+============================================================
+🚀 FACEBOOK SCRAPER - HYBRID + MiniMax AI
+============================================================
+[16:42:26] 📋 Groups: 6
+[16:42:26] 👥 Workers: 3
+[16:42:26] 🔄 Browser reuse limit: 2
+[16:42:26] ⏳ Delay: 2-5 seconds
+[16:42:26] 🧠 AI: JSON format - is_lead, score, reason
+============================================================
+[16:42:26] ✅ Loaded 5 cookies
+[16:42:26] 📋 Queue filled with 6 groups
+[16:42:26] 📁 Existing leads: 48 URLs
+[16:42:26] 🚀 Starting 3 workers...
+[16:42:26] [Worker-1] 🚀 Worker 1 starting...
+[16:42:27] [Worker-2] 🚀 Worker 2 starting...
+[16:42:28] [Worker-3] 🚀 Worker 3 starting...
+[16:42:29] [Worker-1] 📂 Loading group: 1925997401002801
+[16:42:30] [Worker-2] 📂 Loading group: 383849116272497
+[16:42:31] [Worker-3] 📂 Loading group: 2317142971864047
+[16:42:35] [Worker-1]    📜 Scroll 1/3...
+[16:42:36] [Worker-3]    📜 Scroll 1/3...
+[16:42:36] [Worker-2]    📜 Scroll 1/3...
+[16:42:38] [Worker-2]       📰 Found 0 posts
+[16:42:38] [Worker-1]       📰 Found 0 posts
+[16:42:40] [Worker-3]       📰 Found 0 posts
+[16:42:42] [Worker-1]    📜 Scroll 2/3...
+[16:42:42] [Worker-2]    📜 Scroll 2/3...
+[16:42:42] [Worker-3]    📜 Scroll 2/3...
+[16:42:45] [Worker-1]       📰 Found 0 posts
+[16:42:45] [Worker-2]       📰 Found 0 posts
+[16:42:47] [Worker-3]       📰 Found 0 posts
+[16:42:47] [Worker-1]    📜 Scroll 3/3...
+[16:42:49] [Worker-2]    📜 Scroll 3/3...
+[16:42:50] [Worker-1]       📰 Found 0 posts
+[16:42:52] [Worker-3]    📜 Scroll 3/3...
+[16:42:52] [Worker-2]       📰 Found 0 posts
+[16:42:55] [Worker-3]       📰 Found 0 posts
+[16:43:01] [Worker-2] 📂 Loading group: thaisolarcell
+[16:43:02] [Worker-1] 📂 Loading group: 1671213103178339
+[16:43:06] [Worker-2]    📜 Scroll 1/3...
+[16:43:06] [Worker-3] 📂 Loading group: 429829328127055
+[16:43:07] [Worker-1]    📜 Scroll 1/3...
+[16:43:09] [Worker-2]       📰 Found 0 posts
+[16:43:10] [Worker-3]    📜 Scroll 1/3...
+[16:43:10] [Worker-1]       📰 Found 0 posts
+[16:43:12] [Worker-2]    📜 Scroll 2/3...
+[16:43:13] [Worker-3]       📰 Found 0 posts
+[16:43:14] [Worker-1]    📜 Scroll 2/3...
+[16:43:16] [Worker-1]       📰 Found 0 posts
+[16:43:17] [Worker-3]    📜 Scroll 2/3...
+[16:43:17] [Worker-2]       📰 Found 0 posts
+[16:43:18] [Worker-1]    📜 Scroll 3/3...
+[16:43:20] [Worker-3]       📰 Found 0 posts
+[16:43:20] [Worker-2]    📜 Scroll 3/3...
+[16:43:23] [Worker-2]       📰 Found 0 posts
+[16:43:23] [Worker-3]    📜 Scroll 3/3...
+[16:43:23] [Worker-1]       📰 Found 0 posts
+[16:43:28] [Worker-3]       📰 Found 0 posts
+[16:43:31] [Worker-2] 🏁 Worker 2 queue empty, exiting
+[16:43:31] [Worker-2] 🏁 Worker 2 done. Total leads: 0
+[16:43:33] [Worker-1] 🏁 Worker 1 queue empty, exiting
+[16:43:33] [Worker-1] 🏁 Worker 1 done. Total leads: 0
+[16:43:36] [Worker-3] 🏁 Worker 3 queue empty, exiting
+[16:43:36] [Worker-3] 🏁 Worker 3 done. Total leads: 0
+============================================================
+✅ COMPLETE!
+📊 Leads found this run: 0
+📁 Total in leads folder: 56
+🏁 Groups completed: 6
+💡 Run /wbuyer to export CSV
+============================================================
+
+========== FINAL: 2026-04-22 09:43:37 ==========
+Running /wbuyer to export...
+[16:43:37] ==================================================
+[16:43:37] 📊 EXPORT LEADS TO CSV
+[16:43:37] ==================================================
+[16:43:37] ✅ Exported 56 leads to CSV
+[16:43:37] 📁 /root/.openclaw/workspace/facebook-scraper/csv_exports/leads_20260422_164337.csv
+[16:43:37] 📋 Columns: No, Post URL, Message, Group, PostDate, Score, Reason, Contact, ScrapedAt
+[16:43:44] ✅ Sent detailed report to Telegram!
+[16:43:44] ==================================================
+
+========== COMPLETED: 2026-04-22 09:43:44 ==========

@@ -95,12 +95,14 @@ def filter_posts(posts):
 async def send_admin_alert(leads, total_posts, analyzed_posts):
     bot = Bot(token=TELEGRAM_TOKEN)
     
-    # Count sellers and buyers
-    sellers = sum(1 for p in analyzed_posts if p.get('score', 0) == 0)
-    buyers = total_posts - sellers
+    # Count sellers and buyers (based on analyzed_posts, not raw total)
+    analyzed_count = len(analyzed_posts)
+    sellers = sum(1 for p in analyzed_posts if not p.get('is_lead', False))
+    buyers = sum(1 for p in analyzed_posts if p.get('is_lead', False))
+    leads_count = sum(1 for p in analyzed_posts if p.get('is_lead', False) and p.get('score', 0) > 0)
     
     if not leads:
-        msg = f"📭 ไม่พบ Lead ใหม่วันนี้ ({thai_time_str()})\n━━━━━━━━━━━━━━━━━━━━━━\n📝 วิเคราะห์: {total_posts} โพส\n🔴 Seller: {sellers} | 🟢 Buyer: {buyers}\n🔍 Lead ที่เจอ: 0"
+        msg = f"📭 ไม่พบ Lead ใหม่วันนี้ ({thai_time_str()})\n━━━━━━━━━━━━━━━━━━━━━━\n📝 วิเคราะห์: {analyzed_count} โพส\n🔴 Seller: {sellers} | 🟢 Buyer: {buyers}\n🔍 Lead ที่เจอ: {leads_count}"
         await bot.send_message(chat_id=ADMIN_USER_ID, text=msg)
         return
     

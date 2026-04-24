@@ -39,6 +39,7 @@ def load_all_posts():
 def filter_posts(posts):
     leads = []
     seen_urls = set()  # Track URLs to avoid duplicates
+    analyzed_posts = []  # Track all analyzed posts for counting
     
     print(f"{'='*60}")
     print(f"🔍 วิเคราะห์ {len(posts)} โพสด้วย Keyword Filter v2")
@@ -59,6 +60,13 @@ def filter_posts(posts):
         seen_urls.add(url)
         
         result = ultra_analyze(msg, url, group)
+        
+        analyzed_posts.append({
+            'url': url,
+            'score': result['score'],
+            'is_lead': result['is_lead'],
+            'reason': result['reason']
+        })
         
         if result['is_lead']:
             leads.append({
@@ -82,13 +90,17 @@ def filter_posts(posts):
     print(f"{'='*60}")
     print(f"📊 ผลลัพธ์: {len(leads)} leads / {len(posts) - len(leads)} ไม่ใช่ lead")
     print(f"{'='*60}")
-    return leads
+    return leads, analyzed_posts
 
-async def send_admin_alert(leads, total_posts):
+async def send_admin_alert(leads, total_posts, analyzed_posts):
     bot = Bot(token=TELEGRAM_TOKEN)
     
+    # Count sellers and buyers
+    sellers = sum(1 for p in analyzed_posts if p.get('score', 0) == 0)
+    buyers = total_posts - sellers
+    
     if not leads:
-        msg = f"📭 ไม่พบ Lead ใหม่วันนี้ ({thai_time_str()})\n━━━━━━━━━━━━━━━━━━━━━━\n📝 วิเคราะห์: {total_posts} โพส\n🔍 Lead ที่เจอ: 0"
+        msg = f"📭 ไม่พบ Lead ใหม่วันนี้ ({thai_time_str()})\n━━━━━━━━━━━━━━━━━━━━━━\n📝 วิเคราะห์: {total_posts} โพส\n🔴 Seller: {sellers} | 🟢 Buyer: {buyers}\n🔍 Lead ที่เจอ: 0"
         await bot.send_message(chat_id=ADMIN_USER_ID, text=msg)
         return
     
@@ -131,8 +143,8 @@ async def send_admin_alert(leads, total_posts):
             reason_clean = re.sub(r'[🟢🟡🔵🔥💬📢✅❌⚠️🎉]+', '', lead['reason']).strip()
             f.write(f'{i},"{lead["group"]}","{lead["url"]}","{msg_text}",{lead["score"]},"{reason_clean}","{post_time_formatted}","","{scraped_at}"\n')
     
-    # Create message
-    msg = f"🟢 พบ Buyer Leads ใหม่!\n⏰ เมื่อ: {thai_time_str()} (UTC+7)\n📊 พบ: {len(leads)} โพส\n👥 Workers: วิเคราะห์ทั้งหมด\n\n💡 พิมพ์ /wbuyer เพื่อ export CSV\n\n━━━━━━━━━━━━━━━━━━━━━━"
+    # Create message with seller/buyer count
+    msg = f"🟢 พบ Buyer Leads ใหม่!\n⏰ เมื่อ: {thai_time_str()} (UTC+7)\n📊 พบ: {len(leads)} โพส\n🔴 Seller: {sellers} | 🟢 Buyer: {buyers}\n\n💡 พิมพ์ /wbuyer เพื่อ export CSV\n\n━━━━━━━━━━━━━━━━━━━━━━"
     
     for i, lead in enumerate(leads[:5], 1):
         emoji = "🔵"
@@ -167,10 +179,10 @@ def main():
     
     print(f"📥 โหลด {len(posts)} โพสแล้ว")
     
-    leads = filter_posts(posts)
+    leads, analyzed_posts = filter_posts(posts)
     
     print(f"📤 ส่งแจ้งเตือนให้ Admin...")
-    asyncio.run(send_admin_alert(leads, len(posts)))
+    asyncio.run(send_admin_alert(leads, len(posts), analyzed_posts))
     
     for i, lead in enumerate(leads, 1):
         filename = f"lead_filtered_{(datetime.now() + THAI_OFFSET).strftime('%Y%m%d_%H%M%S')}_{i}.json"

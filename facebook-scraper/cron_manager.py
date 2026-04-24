@@ -147,7 +147,8 @@ async def handle_cron_command(args, user_id):
             await send_message(
                 "❌ ระบุเวลา\n"
                 "Example: /cron add 0.5 (30 นาที)\n"
-                "หรือ /cron add 1.0 (1 ชม)", user_id
+                "หรือ /cron add 1.0 (1 ชม)\n"
+                "หรือ /cron add 2.30 (2 ชม 30 นาที)", user_id
             )
             return
         
@@ -167,19 +168,23 @@ async def handle_cron_command(args, user_id):
             if m > 0:
                 time_str += f" {m} นาที"
             
-            msg = f"✅ ตั้ง cronjob แล้ว!\n⏰ ทุก{time_str}\n🗑️ พิมพ์ /cron remove เพื่อลบ"
+            msg = f"✅ ตั้ง cronjob สำเร็จ!\n"
+            msg += f"⏰ ทำงานทุก {time_str}\n"
+            msg += f"📊 ทุก {total_minutes} นาที\n\n"
+            msg += f"🗑️ พิมพ์ /cron remove เพื่อยกเลิก\n"
+            msg += f"📋 พิมพ์ /cron status เพื่อดูสถานะ"
             await send_message(msg, user_id)
             
             # Also notify primary admin
             if user_id != PRIMARY_ADMIN:
                 await send_message(
-                    f"🔔 แจ้งเตือน: User {user_id} ตั้ง cronjob ทุก {total_minutes} นาที", 
+                    f"🔔 แจ้งเตือน: User {user_id} ตั้ง cronjob ทุก {time_str} ({total_minutes} นาที)", 
                     PRIMARY_ADMIN
                 )
         except ValueError:
             await send_message(
                 "❌ รูปแบบไม่ถูกต้อง\n"
-                "Example: /cron add 0.5 หรือ /cron add 1.0", 
+                "Example: /cron add 0.5 หรือ /cron add 1.0 หรือ /cron add 2.30", 
                 user_id
             )
     
@@ -188,18 +193,36 @@ async def handle_cron_command(args, user_id):
             await send_message("❌ คุณไม่มีสิทธิ์ลบ cronjob", user_id)
             return
         
+        state = load_state()
+        old_interval = state.get('interval_minutes', 0)
+        h = old_interval // 60
+        m = old_interval % 60
+        old_time_str = f"{h} ชั่วโมง {m} นาที" if h > 0 else f"{m} นาที"
+        
         remove_cronjob()
-        await send_message("✅ ลบ cronjob ทั้งหมดแล้ว!", user_id)
+        msg = f"✅ ลบ cronjob ทั้งหมดแล้ว!\n"
+        msg += f"⏰ ลบการทำงานทุก {old_time_str}"
+        await send_message(msg, user_id)
     
     elif cmd == 'status':
         state = load_state()
         status = "✅ เปิดอยู่" if state['active'] else "❌ ปิดอยู่"
-        msg = f"📊 Cron Status\n\nสถานะ: {status}"
+        
+        msg = f"📊 Cron Status\n\nสถานะ: {status}\n"
+        
         if state['active']:
-            msg += f"\n⏰ ทุก {state['interval_minutes']} นาที"
+            total_min = state['interval_minutes']
+            h = total_min // 60
+            m = total_min % 60
+            time_str = f"{h} ชั่วโมง {m} นาที" if h > 0 else f"{m} นาที"
+            msg += f"⏰ ทำงานทุก {time_str}\n"
+            msg += f"📊 ทุก {total_min} นาที\n"
+        
         if state['last_run']:
-            msg += f"\n🕐 รันล่าสุด: {state['last_run']}"
-        msg += f"\n📊 รันไปแล้ว: {state['total_runs']} ครั้ง"
+            msg += f"🕐 รันล่าสุด: {state['last_run']}\n"
+        
+        msg += f"📊 รันไปแล้ว: {state['total_runs']} ครั้ง\n\n"
+        msg += f"📋 พิมพ์ /cron list เพื่อดูรายละเอียดเพิ่มเติม"
         await send_message(msg, user_id)
     
     else:

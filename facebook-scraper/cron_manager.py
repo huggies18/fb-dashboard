@@ -25,7 +25,7 @@ sys.path.insert(0, '.')
 # Config
 TELEGRAM_TOKEN = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
 PRIMARY_ADMIN = 6780942246  # Tibodin
-SECONDARY_USER = 8698062232  # First Nick
+SECONDARY_USER = 8698062232  # Nick
 ALLOWED_USERS = [PRIMARY_ADMIN, SECONDARY_USER]  # Users ที่สามารถรับคำสั่งได้ทั้งหมด
 CRON_STATE_FILE = '/root/.openclaw/workspace/facebook-scraper/cron_state.json'
 

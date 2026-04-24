@@ -47,7 +47,7 @@ def scrape_group_all_posts(page, group_id, all_posts):
     page.goto(f"https://www.facebook.com/groups/{group_id}", timeout=45000)
     time.sleep(random.uniform(3, 6))  # Wait before scroll like human
     
-    scrolls = random.randint(4, 7)
+    scrolls = random.randint(3, 5)
     log(f"📂 Group: {group_id} | Scrolls: {scrolls}")
     
     for scroll_num in range(scrolls):

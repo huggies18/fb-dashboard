@@ -47,7 +47,9 @@ def ultra_analyze(post_text, post_url, group_id):
         # ช่องทางติดต่อ
         'ib', 'inbox', 'ทักแชท', 'แชท',
         # ลิ้ง/สั่ง
-        'ลิ้ง', 'shopee', 'กดสั่ง', 'สั่งในช้อปี้', 'กดลิ้งสั่ง'
+        'ลิ้ง', 'shopee', 'กดสั่ง', 'สั่งในช้อปี้', 'กดลิ้งสั่ง',
+        # ลูกค้าอุดหนุน (seller พูดถึงลูกค้า)
+        'อุดหนุนสินค้า', 'จัดอีกสักตู้', 'ลูกค้านะครับที่อุดหนุน'
     ]
     
     for phrase in strong_seller:
@@ -58,6 +60,27 @@ def ultra_analyze(post_text, post_url, group_id):
                 'reason': "❌ โฆษณาขาย",
                 'intent_type': "seller",
                 'all_reasons': ["❌ " + phrase]
+            }
+    
+    # ==================== STEP 0.5: CONSULTATION QUESTIONS (before HIGH) ====================
+    consultation_phrases = [
+        'ขอสอบถาม', 'สอบถามผู้รู้', 'ดีไหม', 
+        'เป็นไง', 'ควรเลือก', 'เลือกยังไง', 'ช่วยดู', 'ช่วยตรวจ', 'ช่วยเช็ค',
+        'ขอดู', 'ดูหน่อย', 'มีดูไหม', 'รีวิว', 'ขอรีวิว',
+        'ใครเคย', 'มีใครรู้บ้าง', 'วิธีการ', 'ขั้นตอน',
+        'ขอความเห็น', 'ขอคำปรึกษา',
+        'สอบถาม', 'รบกวนถาม', 'อยากสอบถาม',
+        'ต้องขออนุญาตไหม', 'รับไหวไหม', 'ตัดได้ไหม'
+    ]
+    
+    for phrase in consultation_phrases:
+        if phrase in lower:
+            return {
+                'is_lead': True,
+                'score': 3,
+                'reason': "🔵 สอบถาม",
+                'intent_type': "buyer",
+                'all_reasons': ["🔵 " + phrase]
             }
     
     # ==================== STEP 1: HIGH INTENT ====================
@@ -123,28 +146,8 @@ def ultra_analyze(post_text, post_url, group_id):
                 'all_reasons': ["🟢 " + phrase]
             }
     
-    # ==================== STEP 3: COLD/QUESTIONS ====================
-    cold_phrases = [
-        'ขอสอบถาม', 'สอบถามผู้รู้', 'ดีไหม', 
-        'เป็นไง', 'ควรเลือก', 'เลือกยังไง', 'ช่วยดู', 'ช่วยตรวจ', 'ช่วยเช็ค',
-        'ขอดู', 'ดูหน่อย', 'มีดูไหม', 'รีวิว', 'ขอรีวิว',
-        'ใครเคย', 'มีใครรู้บ้าง', 'วิธีการ', 'ขั้นตอน',
-        'ขอความเห็น', 'ขอคำปรึกษา',
-        'สอบถาม', 'รบกวนถาม', 'อยากสอบถาม',
-        'ต้องขออนุญาตไหม'
-    ]
-    
-    for phrase in cold_phrases:
-        if phrase in lower:
-            return {
-                'is_lead': True,
-                'score': 3,
-                'reason': "🔵 สอบถาม",
-                'intent_type': "buyer",
-                'all_reasons': ["🔵 " + phrase]
-            }
-    
-    # ==================== STEP 4: EVAL/SPEC ====================
+    # ==================== STEP 3: COLD/QUESTIONS (legacy - ลบออกแล้ว ใช้ STEP 0.5 แทน) ====================
+    # cold_phrases ย้ายไป STEP 0.5 แล้ว
     eval_intent = [
         # อุปกรณ์/Spec
         'แผง n-type', 'แผง p-type', 'n-type', 'p-type',

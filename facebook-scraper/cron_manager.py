@@ -2,11 +2,15 @@
 """
 Cron Manager - จัดการ Cronjobs สำหรับ Facebook Scraper
 =======================================================
+รองรับ 2 Users:
+  - Primary Admin (6780942246): สั่งได้ทุกคำสั่ง
+  - Secondary User: สั่งได้เฉพาะ /cron add, /cron status, /cron list, /cron remove
+
 Commands:
   /cron list          - แสดง cronjobs ปัจจุบัน
   /cron add X.Y       - เพิ่ม cronjob ทุก X ชั่วโมง Y นาที
   /cron remove        - ลบ cronjob ทั้งหมด
-  /cron status        - แสดงสถานะ cronjob ล่าสุน
+  /cron status        - แสดงสถานะ cronjob ล่าสุด
 """
 
 import sys
@@ -20,7 +24,8 @@ sys.path.insert(0, '.')
 
 # Config
 TELEGRAM_TOKEN = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
-ADMIN_USER_ID = 6780942246
+PRIMARY_ADMIN = 6780942246  # Tibodin
+ALLOWED_USERS = [PRIMARY_ADMIN]  # Users ที่สามารถรับคำสั่งได้ทั้งหมด
 CRON_STATE_FILE = '/root/.openclaw/workspace/facebook-scraper/cron_state.json'
 
 THAI_OFFSET = timedelta(hours=7)
@@ -72,23 +77,54 @@ def remove_cronjob():
     
     return True
 
-async def send_message(text):
+async def send_message(text, user_id):
+    """ส่งข้อความไปยัง user ที่ระบุ"""
+    import asyncio
     bot = Bot(token=TELEGRAM_TOKEN)
     try:
-        msg = await bot.send_message(chat_id=ADMIN_USER_ID, text=text)
-        print(f"[DEBUG] Sent message {msg.message_id}")
+        msg = await bot.send_message(chat_id=user_id, text=text)
+        print(f"[DEBUG] Sent message {msg.message_id} to {user_id}")
     except Exception as e:
-        print(f"[ERROR] Failed to send: {e}")
-    await bot.close()
+        print(f"[ERROR] Failed to send to {user_id}: {e}")
+    finally:
+        await asyncio.sleep(1)
     return
 
-async def handle_cron_command(args):
-    """Handle /cron command"""
+async def handle_cron_command(args, user_id):
+    """Handle /cron command with permission check"""
+    
+    # Check permission - only PRIMARY_ADMIN can use full commands
+    is_primary_admin = (user_id == PRIMARY_ADMIN)
+    
+    # Limited commands for non-primary users
+    limited_commands = ['add', 'status', 'list', 'remove']
+    
     if not args:
-        await send_message("📋 Cron Manager\n\nCommands:\n/cron list - แสดง cronjobs\n/cron add X.Y - เพิ่ม cronjob (X ชม Y นาที)\n/cron remove - ลบ cronjob ทั้งหมด\n/cron status - สถานะ")
+        if is_primary_admin:
+            await send_message(
+                "📋 Cron Manager\n\n"
+                "Commands:\n"
+                "/cron list - แสดง cronjobs\n"
+                "/cron add X.Y - เพิ่ม cronjob (X ชม Y นาที)\n"
+                "/cron remove - ลบ cronjob ทั้งหมด\n"
+                "/cron status - สถานะ", user_id
+            )
+        else:
+            await send_message(
+                "📋 Cron Manager (Limited)\n\n"
+                "Commands:\n"
+                "/cron list - แสดง cronjobs\n"
+                "/cron add X.Y - เพิ่ม cronjob\n"
+                "/cron status - สถานะ", user_id
+            )
         return
     
     cmd = args[0].lower()
+    
+    # Check if command is allowed for this user
+    if not is_primary_admin and cmd not in limited_commands:
+        await send_message("❌ คุณไม่มีสิทธิ์ใช้คำสั่งนี้", user_id)
+        return
     
     if cmd == 'list':
         jobs = get_cron_jobs()
@@ -104,18 +140,22 @@ async def handle_cron_command(args):
             msg += f"\n\nCronjobs:\n{jobs}"
         else:
             msg += "\n\n(ไม่มี cronjobs)"
-        await send_message(msg)
+        await send_message(msg, user_id)
     
     elif cmd == 'add':
         if len(args) < 2:
-            await send_message("❌ ระบุเวลา\nExample: /cron add 0.5 (30 นาที) หรือ /cron add 1.0 (1 ชม)")
+            await send_message(
+                "❌ ระบุเวลา\n"
+                "Example: /cron add 0.5 (30 นาที)\n"
+                "หรือ /cron add 1.0 (1 ชม)", user_id
+            )
             return
         
         try:
             hours = float(args[1])
             total_minutes = int(hours * 60)
             if total_minutes < 1:
-                await send_message("❌ ต้องมากกว่า 1 นาที")
+                await send_message("❌ ต้องมากกว่า 1 นาที", user_id)
                 return
             
             add_cronjob(total_minutes)
@@ -126,17 +166,33 @@ async def handle_cron_command(args):
                 time_str += f"{h} ชั่วโมง"
             if m > 0:
                 time_str += f" {m} นาที"
-            await send_message(f"✅ เพิ่ม cronjob แล้ว!\n⏰ ทุก{time_str}\n🗑️ พิมพ์ /cron remove เพื่อลบ")
+            
+            msg = f"✅ ตั้ง cronjob แล้ว!\n⏰ ทุก{time_str}\n🗑️ พิมพ์ /cron remove เพื่อลบ"
+            await send_message(msg, user_id)
+            
+            # Also notify primary admin
+            if user_id != PRIMARY_ADMIN:
+                await send_message(
+                    f"🔔 แจ้งเตือน: User {user_id} ตั้ง cronjob ทุก {total_minutes} นาที", 
+                    PRIMARY_ADMIN
+                )
         except ValueError:
-            await send_message("❌ รูปแบบไม่ถูกต้อง\nExample: /cron add 0.5 หรือ /cron add 1.0")
+            await send_message(
+                "❌ รูปแบบไม่ถูกต้อง\n"
+                "Example: /cron add 0.5 หรือ /cron add 1.0", 
+                user_id
+            )
     
     elif cmd == 'remove':
+        if not is_primary_admin:
+            await send_message("❌ คุณไม่มีสิทธิ์ลบ cronjob", user_id)
+            return
+        
         remove_cronjob()
-        await send_message("✅ ลบ cronjob ทั้งหมดแล้ว!")
+        await send_message("✅ ลบ cronjob ทั้งหมดแล้ว!", user_id)
     
     elif cmd == 'status':
         state = load_state()
-        jobs = get_cron_jobs()
         status = "✅ เปิดอยู่" if state['active'] else "❌ ปิดอยู่"
         msg = f"📊 Cron Status\n\nสถานะ: {status}"
         if state['active']:
@@ -144,17 +200,17 @@ async def handle_cron_command(args):
         if state['last_run']:
             msg += f"\n🕐 รันล่าสุด: {state['last_run']}"
         msg += f"\n📊 รันไปแล้ว: {state['total_runs']} ครั้ง"
-        await send_message(msg)
+        await send_message(msg, user_id)
     
     else:
-        await send_message("❌ คำสั่งไม่ถูกต้อง\n\nCommands:\n/cron list\n/cron add X.Y\n/cron remove\n/cron status")
-
+        await send_message("❌ คำสั่งไม่ถูกต้อง", user_id)
 
 if __name__ == '__main__':
     args = sys.argv[1:]
+    user_id = int(sys.argv[2]) if len(sys.argv) > 2 else PRIMARY_ADMIN
     
     async def main():
-        await handle_cron_command(args)
+        await handle_cron_command(args, user_id)
         print("✅ Cron command executed")
     
     asyncio.run(main())

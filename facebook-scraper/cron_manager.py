@@ -25,7 +25,8 @@ sys.path.insert(0, '.')
 # Config
 TELEGRAM_TOKEN = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
 PRIMARY_ADMIN = 6780942246  # Tibodin
-ALLOWED_USERS = [PRIMARY_ADMIN]  # Users ที่สามารถรับคำสั่งได้ทั้งหมด
+SECONDARY_USER = 8698062232  # First Nick
+ALLOWED_USERS = [PRIMARY_ADMIN, SECONDARY_USER]  # Users ที่สามารถรับคำสั่งได้ทั้งหมด
 CRON_STATE_FILE = '/root/.openclaw/workspace/facebook-scraper/cron_state.json'
 
 THAI_OFFSET = timedelta(hours=7)
@@ -95,9 +96,13 @@ async def handle_cron_command(args, user_id):
     
     # Check permission - only PRIMARY_ADMIN can use full commands
     is_primary_admin = (user_id == PRIMARY_ADMIN)
+    is_secondary_user = (user_id == SECONDARY_USER)
     
-    # Limited commands for non-primary users
+    # Limited commands for secondary user
     limited_commands = ['add', 'status', 'list', 'remove']
+    
+    # All users can use cron commands
+    cron_commands = ['list', 'add', 'remove', 'status']
     
     if not args:
         if is_primary_admin:
@@ -189,7 +194,7 @@ async def handle_cron_command(args, user_id):
             )
     
     elif cmd == 'remove':
-        if not is_primary_admin:
+        if not is_primary_admin and not is_secondary_user:
             await send_message("❌ คุณไม่มีสิทธิ์ลบ cronjob", user_id)
             return
         
@@ -203,6 +208,13 @@ async def handle_cron_command(args, user_id):
         msg = f"✅ ลบ cronjob ทั้งหมดแล้ว!\n"
         msg += f"⏰ ลบการทำงานทุก {old_time_str}"
         await send_message(msg, user_id)
+        
+        # Notify primary admin
+        if user_id != PRIMARY_ADMIN:
+            await send_message(
+                f"🔔 แจ้งเตือน: User {user_id} ลบ cronjob", 
+                PRIMARY_ADMIN
+            )
     
     elif cmd == 'status':
         state = load_state()

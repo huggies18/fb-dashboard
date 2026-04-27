@@ -19,7 +19,7 @@ SCRAPER_LOG = '/root/.openclaw/workspace/facebook-scraper/scrape_all.log'
 ALL_POSTS_FILE = '/root/.openclaw/workspace/facebook-scraper/all_posts.json'
 CSV_DIR = '/root/.openclaw/workspace/facebook-scraper/csv_exports'
 BOT_TOKEN = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
-ADMIN_USER_ID = 6780942246
+ADMIN_USER_IDS = [6780942246, 8698062232]  # Tibodin, Nick
 THAI_OFFSET = timedelta(hours=7)
 
 from ai_minimax_filter import minimax_analyze
@@ -32,17 +32,19 @@ def thai_now():
 
 async def send_telegram(msg):
     bot = Bot(token=BOT_TOKEN)
-    await bot.send_message(chat_id=ADMIN_USER_ID, text=msg)
+    for uid in ADMIN_USER_IDS:
+        await bot.send_message(chat_id=uid, text=msg)
 
 async def send_csv(caption, filepath, filename):
     bot = Bot(token=BOT_TOKEN)
-    with open(filepath, 'rb') as f:
-        await bot.send_document(
-            chat_id=ADMIN_USER_ID,
-            document=f,
-            filename=filename,
-            caption=caption
-        )
+    for uid in ADMIN_USER_IDS:
+        with open(filepath, 'rb') as f:
+            await bot.send_document(
+                chat_id=uid,
+                document=f,
+                filename=filename,
+                caption=caption
+            )
 
 async def step1_scrape():
     """Step 1: Scrape all posts"""

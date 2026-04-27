@@ -28,6 +28,7 @@ from telegram import Bot
 
 THAI_OFFSET = timedelta(hours=7)
 LEADS_DIR = "/root/.openclaw/workspace/facebook-scraper/leads"
+PENDING_DIR = "/root/.openclaw/workspace/facebook-scraper/pending"
 CSV_DIR = "/root/.openclaw/workspace/facebook-scraper/csv_exports"
 
 BOT_TOKEN = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
@@ -91,45 +92,60 @@ def truncate_message(message, max_len=80):
     return msg
 
 def export_csv():
-    """Export leads to CSV"""
+    """Export leads + rejected posts to CSV"""
     os.makedirs(CSV_DIR, exist_ok=True)
     
     lead_files = sorted([f for f in os.listdir(LEADS_DIR) if f.startswith('lead_') and f.endswith('.json')])
+    rejected_files = sorted([f for f in os.listdir(PENDING_DIR) if f.startswith('rejected_') and f.endswith('.json')])
     
-    if not lead_files:
-        log("❌ No leads to export")
+    if not lead_files and not rejected_files:
+        log("❌ No posts to export")
         log(f"💡 Run /fbuyer first")
         return None
     
-    leads = []
+    all_posts = []
+    
+    # Load leads
     for fname in lead_files:
         fpath = os.path.join(LEADS_DIR, fname)
         try:
             with open(fpath, 'r') as f:
-                lead = json.load(f)
-                leads.append(lead)
+                post = json.load(f)
+                post['_source'] = 'lead'
+                all_posts.append(post)
         except:
             continue
     
-    if not leads:
-        log("❌ No leads to export")
+    # Load rejected
+    for fname in rejected_files:
+        fpath = os.path.join(PENDING_DIR, fname)
+        try:
+            with open(fpath, 'r') as f:
+                post = json.load(f)
+                post['_source'] = 'rejected'
+                all_posts.append(post)
+        except:
+            continue
+    
+    if not all_posts:
+        log("❌ No posts to export")
         return None
     
     # Sort by scraped_at (newest first)
-    leads.sort(key=lambda x: x.get('scraped_at', ''), reverse=True)
+    all_posts.sort(key=lambda x: x.get('scraped_at', ''), reverse=True)
     
     thai_now_dt = thai_now()
     timestamp = thai_now_dt.strftime("%Y%m%d_%H%M%S")
-    csv_filename = f"leads_{timestamp}.csv"
+    csv_filename = f"all_posts_{timestamp}.csv"
     csv_filepath = os.path.join(CSV_DIR, csv_filename)
     
     with open(csv_filepath, 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.writer(f)
-        writer.writerow(['No', 'Post URL', 'Message', 'Score', 'Reason', 'Group', 'PostDate', 'Contact', 'ScrapedAt'])
+        writer.writerow(['No', 'Status', 'Post URL', 'Message', 'Score', 'Reason', 'Group', 'PostDate', 'Contact', 'ScrapedAt'])
         
-        for i, lead in enumerate(leads, 1):
+        for i, post in enumerate(all_posts, 1):
             # Convert scraped_at to Bangkok time
-            scraped_at = lead.get('scraped_at', '')
+            scraped_at = post.get('scraped_at', '')
             if scraped_at:
                 try:
                     dt = datetime.fromisoformat(scraped_at)
@@ -139,28 +155,35 @@ def export_csv():
             else:
                 bkk_time = ''
             
+            status = '✅ Lead' if post.get('is_lead') else '❌ Rejected'
+            
             writer.writerow([
                 i,
-                lead.get('url', ''),
-                lead.get('message', ''),
-                lead.get('score', ''),
-                lead.get('reason', ''),
-                lead.get('group', ''),
-                lead.get('post_time', ''),
-                lead.get('contact', ''),
+                status,
+                post.get('url', ''),
+                post.get('message', ''),
+                post.get('score', ''),
+                post.get('reason', ''),
+                post.get('group', ''),
+                post.get('post_time', ''),
+                post.get('contact', ''),
                 bkk_time
             ])
     
-    return csv_filepath, len(leads), csv_filename, leads
+    lead_count = len([p for p in all_posts if p.get('is_lead')])
+    rejected_count = len([p for p in all_posts if not p.get('is_lead')])
+    
+    return csv_filepath, lead_count, rejected_count, csv_filename, all_posts
 
-def build_detailed_report(count, leads):
+def build_detailed_report(lead_count, rejected_count, all_posts):
     """Build detailed lead report message"""
     thai_now_dt = thai_now()
+    total = lead_count + rejected_count
     
     # Header
     header = f"""🟢 พบ Buyer Leads ใหม่!
 ⏰ เมื่อ: {thai_now_dt.strftime('%H:%M')} (UTC+7)
-📊 พบ: {count} โพส
+📊 พบ: {lead_count} Leads | {rejected_count} Rejected (จาก {total} โพส)
 👥 Workers: 3 ตัว
 
 💡 พิมพ์ /wbuyer เพื่อ export CSV
@@ -188,12 +211,12 @@ def build_detailed_report(count, leads):
     
     return report
 
-async def send_telegram_report(csv_filepath, count, csv_filename, leads):
+async def send_telegram_report(csv_filepath, lead_count, rejected_count, csv_filename, all_posts):
     """Send detailed report + CSV to Telegram"""
     bot = Bot(token=BOT_TOKEN)
     
     # Build detailed report
-    report = build_detailed_report(count, leads)
+    report = build_detailed_report(lead_count, rejected_count, all_posts)
     
     # Send report (may need to split if too long)
     if len(report) > 4000:
@@ -222,24 +245,25 @@ async def send_telegram_report(csv_filepath, count, csv_filename, leads):
             chat_id=USER_ID,
             document=f,
             filename=csv_filename,
-            caption=f"📁 CSV: {count} leads"
+            caption=f"📁 CSV: {lead_count} leads, {rejected_count} rejected"
         )
 
 def main():
     log("="*50)
-    log("📊 EXPORT LEADS TO CSV")
+    log("📊 EXPORT ALL POSTS TO CSV (Leads + Rejected)")
     log("="*50)
     
     result = export_csv()
     
     if result:
-        csv_filepath, count, csv_filename, leads = result
-        log(f"✅ Exported {count} leads to CSV")
+        csv_filepath, lead_count, rejected_count, csv_filename, all_posts = result
+        total = lead_count + rejected_count
+        log(f"✅ Exported {lead_count} leads + {rejected_count} rejected = {total} posts to CSV")
         log(f"📁 {csv_filepath}")
-        log(f"📋 Columns: No, Post URL, Message, Group, PostDate, Score, Reason, Contact, ScrapedAt")
+        log(f"📋 Columns: No, Status, Post URL, Message, Score, Reason, Group, PostDate, Contact, ScrapedAt")
         
         # Send detailed report to Telegram
-        asyncio.run(send_telegram_report(csv_filepath, count, csv_filename, leads))
+        asyncio.run(send_telegram_report(csv_filepath, lead_count, rejected_count, csv_filename, all_posts))
         log(f"✅ Sent detailed report to Telegram!")
     else:
         log("❌ Export failed")

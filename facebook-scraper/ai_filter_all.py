@@ -16,11 +16,12 @@ import re
 from telegram import Bot
 
 LEADS_DIR = '/root/.openclaw/workspace/facebook-scraper/leads/'
+PENDING_DIR = '/root/.openclaw/workspace/facebook-scraper/pending/'
 ALL_POSTS_FILE = '/root/.openclaw/workspace/facebook-scraper/all_posts.json'
 THAI_OFFSET = timedelta(hours=7)
 
 # Import AI Filter
-from ai_buyer_filter import ultra_analyze
+from ai_minimax_filter import minimax_analyze
 
 # ==================== TELEGRAM CONFIG ====================
 TELEGRAM_TOKEN = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
@@ -59,13 +60,17 @@ def filter_posts(posts):
             continue
         seen_urls.add(url)
         
-        result = ultra_analyze(msg, url, group)
+        result = minimax_analyze(msg, url, group)
         
         analyzed_posts.append({
             'url': url,
+            'message': msg[:200],
+            'group': group,
+            'time': post_time,
             'score': result['score'],
             'is_lead': result['is_lead'],
-            'reason': result['reason']
+            'reason': result['reason'],
+            'scraped_at': post.get('scraped_at', '')
         })
         
         if result['is_lead']:
@@ -112,17 +117,19 @@ async def send_admin_alert(leads, total_posts, analyzed_posts):
     
     os.makedirs(os.path.dirname(csv_filepath), exist_ok=True)
     
+    # ✅ Separate leads and non-leads
+    non_leads = [p for p in analyzed_posts if not p.get('is_lead', False)]
+    
     with open(csv_filepath, 'w', encoding='utf-8') as f:
         f.write('No,Group,Post URL,Message,Score,Reason,PostDate (UTC+7),Contact,ScrapedAt (UTC+7)\n')
+        
+        # ✅ Section 1: Buyer Leads
+        f.write('\n"=== BUYER LEADS ==="\n\n')
         for i, lead in enumerate(leads, 1):
             msg_text = lead['message'].replace('"', '""')
             scraped_at = (datetime.now() + THAI_OFFSET).strftime('%Y-%m-%d %H:%M:%S')
-            # Calculate actual post time (in UTC+7)
-            # scraped_at is already in UTC+7 (server local time)
-            post_time_str = lead['time']  # e.g., "33 นาที"
-            scraped_at_str = scraped_at  # e.g., "2026-04-23 06:10:49"
+            post_time_str = lead.get('time', '')
             
-            # Parse time string like "33 นาที", "2 ชั่วโมง", "1 วัน"
             match = re.match(r'(\d+)\s*(นาที|ชั่วโมง|วัน)', post_time_str)
             if match:
                 value = int(match.group(1))
@@ -131,19 +138,44 @@ async def send_admin_alert(leads, total_posts, analyzed_posts):
                     delta = timedelta(minutes=value)
                 elif unit == 'ชั่วโมง':
                     delta = timedelta(hours=value)
-                else:  # วัน
+                else:
                     delta = timedelta(days=value)
-                
-                # scraped_at is already in UTC+7, no conversion needed
-                scraped_dt = datetime.strptime(scraped_at_str, '%Y-%m-%d %H:%M:%S')
+                scraped_dt = datetime.strptime(scraped_at, '%Y-%m-%d %H:%M:%S')
                 post_dt = scraped_dt - delta
                 post_time_formatted = post_dt.strftime('%Y-%m-%d %H:%M')
             else:
                 post_time_formatted = post_time_str
             
-            # Remove emoji from reason for CSV
-            reason_clean = re.sub(r'[🟢🟡🔵🔥💬📢✅❌⚠️🎉]+', '', lead['reason']).strip()
-            f.write(f'{i},"{lead["group"]}","{lead["url"]}","{msg_text}",{lead["score"]},"{reason_clean}","{post_time_formatted}","","{scraped_at}"\n')
+            reason_clean = re.sub(r'[🟢🟡🔵🔥💬📢✅❌⚠️🎉]+', '', lead.get('reason', '')).strip()
+            f.write(f'{i},"{lead.get("group", "")}","{lead.get("url", "")}","{msg_text}",{lead.get("score", 0)},"{reason_clean}","{post_time_formatted}","","{scraped_at}"\n')
+        
+        # ✅ Blank rows and non-leads section
+        f.write('\n\n')
+        f.write('\n"=== NOT BUYER LEADS (Filtered Out) ==="\n\n')
+        
+        for i, post in enumerate(non_leads, 1):
+            msg_text = post.get('message', '').replace('"', '""')
+            scraped_at = (datetime.now() + THAI_OFFSET).strftime('%Y-%m-%d %H:%M:%S')
+            post_time_str = post.get('time', '')
+            
+            match = re.match(r'(\d+)\s*(นาที|ชั่วโมง|วัน)', post_time_str)
+            if match:
+                value = int(match.group(1))
+                unit = match.group(2)
+                if unit == 'นาที':
+                    delta = timedelta(minutes=value)
+                elif unit == 'ชั่วโมง':
+                    delta = timedelta(hours=value)
+                else:
+                    delta = timedelta(days=value)
+                scraped_dt = datetime.strptime(scraped_at, '%Y-%m-%d %H:%M:%S')
+                post_dt = scraped_dt - delta
+                post_time_formatted = post_dt.strftime('%Y-%m-%d %H:%M')
+            else:
+                post_time_formatted = post_time_str
+            
+            reason_clean = re.sub(r'[🟢🟡🔵🔥💬📢✅❌⚠️🎉]+', '', post.get('reason', '')).strip()
+            f.write(f'{i},"{post.get("group", "")}","{post.get("url", "")}","{msg_text}",{post.get("score", 0)},"{reason_clean}","{post_time_formatted}","","{scraped_at}"\n')
     
     # Create message with seller/buyer count
     msg = f"🟢 พบ Buyer Leads ใหม่!\n⏰ เมื่อ: {thai_time_str()} (UTC+7)\n📊 พบ: {len(leads)} โพส\n🔴 Seller: {sellers} | 🟢 Buyer: {buyers}\n\n💡 พิมพ์ /wbuyer เพื่อ export CSV\n\n━━━━━━━━━━━━━━━━━━━━━━"
@@ -186,13 +218,25 @@ def main():
     print(f"📤 ส่งแจ้งเตือนให้ Admin...")
     asyncio.run(send_admin_alert(leads, len(posts), analyzed_posts))
     
+    # Save leads
+    os.makedirs(LEADS_DIR, exist_ok=True)
     for i, lead in enumerate(leads, 1):
         filename = f"lead_filtered_{(datetime.now() + THAI_OFFSET).strftime('%Y%m%d_%H%M%S')}_{i}.json"
         filepath = os.path.join(LEADS_DIR, filename)
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(lead, f, ensure_ascii=False, indent=2)
     
-    print(f"✅ เสร็จสิ้น! บันทึก {len(leads)} leads")
+    # Save rejected posts to pending/
+    os.makedirs(PENDING_DIR, exist_ok=True)
+    rejected = [p for p in analyzed_posts if not p.get('is_lead', False)]
+    for i, post in enumerate(rejected, 1):
+        filename = f"rejected_all_{(datetime.now() + THAI_OFFSET).strftime('%Y%m%d_%H%M%S')}_{i}.json"
+        filepath = os.path.join(PENDING_DIR, filename)
+        post['scraped_at'] = (datetime.now() + THAI_OFFSET).strftime('%Y-%m-%d %H:%M:%S')
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(post, f, ensure_ascii=False, indent=2)
+    
+    print(f"✅ เสร็จสิ้น! บันทึก {len(leads)} leads + {len(rejected)} rejected")
 
 if __name__ == "__main__":
     main()

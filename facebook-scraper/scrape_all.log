@@ -1,60 +1,59 @@
-[12:09:01] ============================================================
-[12:09:01] 🚀 SCRAPER - ดึงทุกโพส (ไม่ filter)
-[12:09:01] ============================================================
-[12:09:04] 📂 Loading: 1925997401002801
-[12:09:08] 📂 Group: 1925997401002801 | Scrolls: 6
-[12:09:10]     📜 Scroll 1/6 → Found 0 posts
-[12:09:16]     📜 Scroll 2/6 → Found 0 posts
-[12:09:22]     📜 Scroll 3/6 → Found 0 posts
-[12:09:27]     📜 Scroll 4/6 → Found 0 posts
-[12:09:31]     📜 Scroll 5/6 → Found 0 posts
-[12:09:37]     📜 Scroll 6/6 → Found 0 posts
-[12:09:39]     ✅ Total so far: 0 posts
-[12:09:43] 📂 Loading: 383849116272497
-[12:09:47] 📂 Group: 383849116272497 | Scrolls: 7
-[12:09:49]     📜 Scroll 1/7 → Found 3 posts
-[12:09:56]     📜 Scroll 2/7 → Found 3 posts
-[12:10:03]     📜 Scroll 3/7 → Found 3 posts
-[12:10:08]     📜 Scroll 4/7 → Found 3 posts
-[12:10:12]     📜 Scroll 5/7 → Found 3 posts
-[12:10:17]     📜 Scroll 6/7 → Found 3 posts
-[12:10:23]     📜 Scroll 7/7 → Found 3 posts
-[12:10:24]     ✅ Total so far: 0 posts
-[12:10:28] 📂 Loading: 2317142971864047
-[12:10:33] 📂 Group: 2317142971864047 | Scrolls: 7
-[12:10:38]     📜 Scroll 1/7 → Found 3 posts
-[12:10:42]     📜 Scroll 2/7 → Found 3 posts
-[12:10:47]     📜 Scroll 3/7 → Found 3 posts
-[12:10:53]     📜 Scroll 4/7 → Found 3 posts
-[12:10:57]     📜 Scroll 5/7 → Found 3 posts
-[12:11:03]     📜 Scroll 6/7 → Found 3 posts
-[12:11:07]     📜 Scroll 7/7 → Found 3 posts
-[12:11:08]     ✅ Total so far: 7 posts
-[12:11:12] 📂 Loading: thaisolarcell
-[12:11:15] 📂 Group: thaisolarcell | Scrolls: 5
-[12:11:19]     📜 Scroll 1/5 → Found 3 posts
-[12:11:24]     📜 Scroll 2/5 → Found 3 posts
-[12:11:29]     📜 Scroll 3/5 → Found 3 posts
-[12:11:33]     📜 Scroll 4/5 → Found 3 posts
-[12:11:38]     📜 Scroll 5/5 → Found 3 posts
-[12:11:40]     ✅ Total so far: 12 posts
-[12:11:42] 📂 Loading: 1671213103178339
-[12:11:47] 📂 Group: 1671213103178339 | Scrolls: 5
-[12:11:49]     📜 Scroll 1/5 → Found 3 posts
-[12:11:55]     📜 Scroll 2/5 → Found 3 posts
-[12:12:01]     📜 Scroll 3/5 → Found 3 posts
-[12:12:04]     📜 Scroll 4/5 → Found 3 posts
-[12:12:09]     📜 Scroll 5/5 → Found 3 posts
-[12:12:11]     ✅ Total so far: 17 posts
-[12:12:14] 📂 Loading: 429829328127055
-[12:12:19] 📂 Group: 429829328127055 | Scrolls: 4
-[12:12:22]     📜 Scroll 1/4 → Found 3 posts
-[12:12:28]     📜 Scroll 2/4 → Found 3 posts
-[12:12:34]     📜 Scroll 3/4 → Found 3 posts
-[12:12:37]     📜 Scroll 4/4 → Found 3 posts
-[12:12:38]     ✅ Total so far: 21 posts
-[12:12:42] 
+[11:17:07] ============================================================
+[11:17:07] 🚀 SCRAPER - ดึงทุกโพส (ไม่ filter)
+[11:17:07] ============================================================
+[11:17:17] 📂 Loading: 1925997401002801
+[11:17:24] 📂 Group: 1925997401002801 | Scrolls: 4
+[11:17:27]     📜 Scroll 1/4 → Found 7 posts
+[11:17:32]     📜 Scroll 2/4 → Found 9 posts
+[11:17:37]     📜 Scroll 3/4 → Found 9 posts
+[11:17:42]     📜 Scroll 4/4 → Found 9 posts
+[11:17:43]     ✅ Total so far: 6 posts
+[11:17:46] 📂 Loading: 383849116272497
+[11:17:55] 📂 Group: 383849116272497 | Scrolls: 6
+[11:17:59]     📜 Scroll 1/6 → Found 9 posts
+[11:18:06]     📜 Scroll 2/6 → Found 9 posts
+[11:18:10]     📜 Scroll 3/6 → Found 12 posts
+[11:18:15]     📜 Scroll 4/6 → Found 12 posts
+[11:18:22]     📜 Scroll 5/6 → Found 12 posts
+[11:18:27]     📜 Scroll 6/6 → Found 12 posts
+[11:18:29]     ✅ Total so far: 8 posts
+[11:18:31] 📂 Loading: 2317142971864047
+[11:18:38] 📂 Group: 2317142971864047 | Scrolls: 7
+[11:18:41]     📜 Scroll 1/7 → Found 9 posts
+[11:18:47]     📜 Scroll 2/7 → Found 12 posts
+[11:18:52]     📜 Scroll 3/7 → Found 12 posts
+[11:18:58]     📜 Scroll 4/7 → Found 13 posts
+[11:19:02]     📜 Scroll 5/7 → Found 17 posts
+[11:19:07]     📜 Scroll 6/7 → Found 18 posts
+[11:19:14]     📜 Scroll 7/7 → Found 21 posts
+[11:19:15]     ✅ Total so far: 20 posts
+[11:19:18] 📂 Loading: thaisolarcell
+[11:19:26] 📂 Group: thaisolarcell | Scrolls: 4
+[11:19:30]     📜 Scroll 1/4 → Found 9 posts
+[11:19:36]     📜 Scroll 2/4 → Found 12 posts
+[11:19:40]     📜 Scroll 3/4 → Found 12 posts
+[11:19:44]     📜 Scroll 4/4 → Found 14 posts
+[11:19:46]     ✅ Total so far: 26 posts
+[11:19:48] 📂 Loading: 1671213103178339
+[11:19:56] 📂 Group: 1671213103178339 | Scrolls: 6
+[11:19:58]     📜 Scroll 1/6 → Found 6 posts
+[11:20:04]     📜 Scroll 2/6 → Found 7 posts
+[11:20:11]     📜 Scroll 3/6 → Found 9 posts
+[11:20:16]     📜 Scroll 4/6 → Found 9 posts
+[11:20:21]     📜 Scroll 5/6 → Found 9 posts
+[11:20:27]     📜 Scroll 6/6 → Found 12 posts
+[11:20:29]     ✅ Total so far: 32 posts
+[11:20:32] 📂 Loading: 429829328127055
+[11:20:38] 📂 Group: 429829328127055 | Scrolls: 6
+[11:20:42]     📜 Scroll 1/6 → Found 7 posts
+[11:20:46]     📜 Scroll 2/6 → Found 9 posts
+[11:20:51]     📜 Scroll 3/6 → Found 9 posts
+[11:20:55]     📜 Scroll 4/6 → Found 9 posts
+[11:21:02]     📜 Scroll 5/6 → Found 11 posts
+[11:21:08]     📜 Scroll 6/6 → Found 11 posts
+[11:21:10]     ✅ Total so far: 39 posts
+[11:21:13] 
 ============================================================
-[12:12:42] 📊 TOTAL: 21 posts
-[12:12:42] 💾 Saved to: /root/.openclaw/workspace/facebook-scraper/all_posts.json
-[12:12:42] ============================================================
+[11:21:13] 📊 TOTAL: 39 posts
+[11:21:13] 💾 Saved to: /root/.openclaw/workspace/facebook-scraper/all_posts.json
+[11:21:13] ============================================================

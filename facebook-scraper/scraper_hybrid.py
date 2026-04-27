@@ -204,6 +204,29 @@ def save_lead(analysis, post_url, post_text, post_time, group_id):
     
     return lead
 
+def save_rejected(analysis, post_url, post_text, post_time, group_id):
+    """บันทึกโพสที่ไม่ผ่าน filter"""
+    os.makedirs(PENDING_DIR, exist_ok=True)
+    
+    item = {
+        'url': post_url,
+        'message': post_text[:500],
+        'group': group_id,
+        'post_time': post_time,
+        'scraped_at': datetime.now().isoformat(),
+        'is_lead': False,
+        'score': analysis['score'],
+        'reason': analysis['reason'],
+    }
+    
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+    filepath = os.path.join(PENDING_DIR, f"rejected_{timestamp}.json")
+    
+    with open(filepath, 'w') as f:
+        json.dump(item, f, ensure_ascii=False, indent=2)
+    
+    return item
+
 # ==================== BROWSER MANAGEMENT ====================
 def load_proxy():
     """Load proxy configuration"""
@@ -333,11 +356,14 @@ def scrape_single_group(page, group_id: str, worker_id: int):
                     except:
                         pass
                     
-                    # Save if is_lead
+                    # Save post (lead or rejected)
                     if analysis['is_lead']:
                         lead = save_lead(analysis, post_url, msg, post_time, group_id)
                         leads.append(lead)
                         log(f"      🟢 LEAD | score:{analysis['score']} | {analysis['reason']}", worker_id)
+                    else:
+                        save_rejected(analysis, post_url, msg, post_time, group_id)
+                        log(f"      🔴 REJECTED | score:{analysis['score']} | {analysis['reason']}", worker_id)
                     
                     random_delay()
                     

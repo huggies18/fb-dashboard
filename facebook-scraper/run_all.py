@@ -16,6 +16,7 @@ import asyncio
 
 # Config
 LEADS_DIR = '/root/.openclaw/workspace/facebook-scraper/leads/'
+PENDING_DIR = '/root/.openclaw/workspace/facebook-scraper/pending/'
 ALL_POSTS_FILE = '/root/.openclaw/workspace/facebook-scraper/all_posts.json'
 SCRAPER_LOG = '/root/.openclaw/workspace/facebook-scraper/scrape_all.log'
 THAI_OFFSET = timedelta(hours=7)
@@ -24,7 +25,7 @@ TELEGRAM_TOKEN = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
 ADMIN_USER_ID = 6780942246
 
 sys.path.insert(0, '/root/.openclaw/workspace/facebook-scraper')
-from ai_buyer_filter import ultra_analyze
+from ai_minimax_filter import minimax_analyze
 
 def thai_time_str():
     return (datetime.now() + THAI_OFFSET).strftime("%H:%M:%S")
@@ -54,6 +55,7 @@ def load_all_posts():
 
 def filter_posts(posts):
     leads = []
+    rejected = []
     seen_urls = set()
     
     for post in posts:
@@ -67,37 +69,53 @@ def filter_posts(posts):
             continue
         seen_urls.add(url)
         
-        result = ultra_analyze(msg, url, group)
+        result = minimax_analyze(msg, url, group)
+        
+        post_data = {
+            'url': url,
+            'message': msg[:200],
+            'group': group,
+            'time': post_time,
+            'score': result['score'],
+            'reason': result['reason'],
+            'is_lead': result['is_lead'],
+            'scraped_at': post.get('scraped_at', '')
+        }
         
         if result['is_lead']:
-            leads.append({
-                'url': url,
-                'message': msg[:200],
-                'group': group,
-                'time': post_time,
-                'score': result['score'],
-                'reason': result['reason']
-            })
+            leads.append(post_data)
+        else:
+            rejected.append(post_data)
     
-    return leads
+    return leads, rejected
 
-def create_csv(leads):
-    csv_filename = f'all_leads_{(datetime.now() + THAI_OFFSET).strftime("%Y%m%d_%H%M%S")}.csv'
+def create_csv(leads, rejected):
+    csv_filename = f'all_posts_{(datetime.now() + THAI_OFFSET).strftime("%Y%m%d_%H%M%S")}.csv'
     csv_filepath = f'/root/.openclaw/workspace/facebook-scraper/csv_exports/{csv_filename}'
     os.makedirs(os.path.dirname(csv_filepath), exist_ok=True)
     
     import re
+    scraped_at = thai_now()
+    
+    # Combine and sort all posts
+    all_posts = []
+    for p in leads:
+        p['_status'] = '✅ Lead'
+        all_posts.append(p)
+    for p in rejected:
+        p['_status'] = '❌ Rejected'
+        all_posts.append(p)
     
     with open(csv_filepath, 'w', encoding='utf-8') as f:
-        f.write('No,Group,Post URL,Message,Score,Reason,PostDate (UTC+7),Contact,ScrapedAt (UTC+7)\n')
-        scraped_at = thai_now()
+        f.write('No,Status,Group,Post URL,Message,Score,Reason,PostDate (UTC+7),Contact,ScrapedAt (UTC+7)\n')
         
-        for i, lead in enumerate(leads, 1):
-            msg_text = lead['message'].replace('"', '""')
-            reason_clean = re.sub(r'[🟢🟡🔵🔥💬📢✅❌⚠️🎉]+', '', lead['reason']).strip()
+        for i, post in enumerate(all_posts, 1):
+            msg_text = post['message'].replace('"', '""')
+            reason_clean = re.sub(r'[🟢🟡🔵🔥💬📢✅❌⚠️🎉]+', '', post['reason']).strip()
+            status = post.get('_status', '❌ Rejected')
             
             # Calculate post time
-            post_time_str = lead['time']
+            post_time_str = post.get('time', '')
             match = re.match(r'(\d+)\s*(นาที|ชั่วโมง|วัน)', post_time_str)
             if match:
                 value = int(match.group(1))
@@ -115,7 +133,7 @@ def create_csv(leads):
             else:
                 post_time_formatted = post_time_str
             
-            f.write(f'{i},"{lead["group"]}","{lead["url"]}","{msg_text}",{lead["score"]},"{reason_clean}","{post_time_formatted}","","{scraped_at}"\n')
+            f.write(f'{i},"{status}","{post["group"]}","{post["url"]}","{msg_text}",{post["score"]},"{reason_clean}","{post_time_formatted}","","{scraped_at}"\n')
     
     return csv_filepath, csv_filename
 
@@ -154,16 +172,25 @@ async def main():
     
     print(f"📥 โหลด {len(posts)} โพสแล้ว")
     
-    leads = filter_posts(posts)
-    print(f"📊 พบ {len(leads)} leads")
+    leads, rejected = filter_posts(posts)
+    print(f"📊 พบ {len(leads)} leads, {len(rejected)} rejected")
+    
+    # Save rejected to pending/
+    os.makedirs(PENDING_DIR, exist_ok=True)
+    for i, post in enumerate(rejected, 1):
+        fname = f"rejected_runall_{(datetime.now() + THAI_OFFSET).strftime('%Y%m%d_%H%M%S')}_{i}.json"
+        fpath = os.path.join(PENDING_DIR, fname)
+        with open(fpath, 'w', encoding='utf-8') as f:
+            json.dump(post, f, ensure_ascii=False, indent=2)
+    
+    # Always create CSV (leads + rejected)
+    print(f"[{thai_time_str()}] 📊 Step 3: Create CSV...")
+    csv_filepath, csv_filename = create_csv(leads, rejected)
     
     if not leads:
-        await send_telegram(f"📭 ไม่พบ Lead ใหม่วันนี้\n━━━━━━━━━━━━━━━━━━━━━━\n📝 วิเคราะห์: {len(posts)} โพส\n🔍 Lead ที่เจอ: 0")
+        await send_telegram(f"📭 ไม่พบ Lead ใหม่วันนี้\n━━━━━━━━━━━━━━━━━━━━━━\n📝 วิเคราะห์: {len(posts)} โพส\n🔴 Rejected: {len(rejected)}\n📋 CSV ส่งให้แล้วด้านล่าง\n✅ /runall เสร็จสิ้น!")
+        await send_document(f"📋 CSV: {len(rejected)} rejected posts (ไม่มี leads)", csv_filepath, csv_filename)
         return
-    
-    # Step 3: Create CSV
-    print(f"[{thai_time_str()}] 📊 Step 3: Create CSV...")
-    csv_filepath, csv_filename = create_csv(leads)
     
     # Step 4: Send report + CSV
     print(f"[{thai_time_str()}] 📤 Step 4: Send report...")

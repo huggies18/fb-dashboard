@@ -41,7 +41,7 @@ GROUPS = [
     '429829328127055'
 ]
 
-def scrape_group_all_posts(page, group_id, all_posts, seen_urls):
+def scrape_group_all_posts(page, group_id, all_posts):
     """ดึงทุกโพสที่เจอ"""
     
     page.goto(f"https://www.facebook.com/groups/{group_id}", timeout=45000)
@@ -69,11 +69,6 @@ def scrape_group_all_posts(page, group_id, all_posts, seen_urls):
                 
                 if not post_url:
                     continue
-                
-                # ✅ Skip duplicate URLs
-                if post_url in seen_urls:
-                    continue
-                seen_urls.add(post_url)
                 
                 msg = ""
                 for sel in ['div[data-ad-preview="message"]', 'div[dir="auto"]', 'span[dir="auto"]']:
@@ -131,7 +126,6 @@ def main():
         return
     
     all_posts = []
-    seen_urls = set()  # ✅ Track seen URLs to avoid duplicates
     
     with sync_playwright() as p:
         browser = p.chromium.launch(
@@ -152,7 +146,7 @@ def main():
         for group_id in GROUPS:
             log(f"📂 Loading: {group_id}")
             try:
-                scrape_group_all_posts(page, group_id, all_posts, seen_urls)
+                scrape_group_all_posts(page, group_id, all_posts)
                 log(f"    ✅ Total so far: {len(all_posts)} posts")
             except Exception as e:
                 log(f"    ❌ Error: {e}")

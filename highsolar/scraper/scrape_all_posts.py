@@ -189,9 +189,46 @@ def main():
             args=['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
         )
         
+        # Load proxy from proxy_config.json
+        proxy_config = None
+        try:
+            with open('proxy_config.json', 'r') as f:
+                config = json.load(f)
+                proxies = config.get('proxies', [])
+                for p in proxies:
+                    if p.get('status') == 'active':
+                        proxy_config = {
+                            'type': p.get('type', 'socks5'),
+                            'server': p['server'],
+                            'port': p['port'],
+                            'username': p.get('username'),
+                            'password': p.get('password')
+                        }
+                        break
+        except Exception as e:
+            print(f"Proxy load error: {e}")
+        
+        # Build proxy args
+        proxy_args = {}
+        if proxy_config:
+            proxy_type = proxy_config.get('type', 'http')
+            if proxy_type == 'socks5':
+                server_url = f"socks5://{proxy_config['server']}:{proxy_config['port']}"
+            elif proxy_type == 'socks4':
+                server_url = f"socks4://{proxy_config['server']}:{proxy_config['port']}"
+            else:
+                server_url = f"http://{proxy_config['server']}:{proxy_config['port']}"
+            
+            proxy_args['proxy'] = {'server': server_url}
+            if proxy_config.get('username') and proxy_config.get('password'):
+                proxy_args['proxy']['username'] = proxy_config['username']
+                proxy_args['proxy']['password'] = proxy_config['password']
+            print(f"Using proxy: {proxy_config['server']}:{proxy_config['port']}")
+        
         ctx = browser.new_context(
             viewport={"width": 1920, "height": 1080},
-            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            **proxy_args
         )
         ctx.add_cookies(cookies)
         page = ctx.new_page()

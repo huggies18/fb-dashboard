@@ -1,0 +1,123 @@
+#!/usr/bin/env python3
+"""Full poster flow with WhatsApp dialog - ไม่ใช่ตอนนี้"""
+import sys, json, time
+sys.path.insert(0, '.')
+
+from playwright.sync_api import sync_playwright
+
+PAGE_ID = '61588849713937'
+message = "ทดสอบโพส"
+image_path = '/root/.openclaw/media/tool-image-generation/image-1---95f4a848-78dc-4d6c-814d-ad81dfc87c01.png'
+
+with sync_playwright() as p:
+    browser = p.chromium.launch(
+        headless=True,
+        args=['--no-sandbox', '--disable-setuid-sandbox',
+              '--disable-dev-shm-usage', '--disable-gpu']
+    )
+    ctx = browser.new_context(
+        viewport={"width": 1280, "height": 900},
+        user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36'
+    )
+
+    with open('fb_poster_session.json') as f:
+        session = json.load(f)
+    cookies = session.get('cookies', [])
+    ctx.add_cookies(cookies)
+    page = ctx.new_page()
+
+    page.goto(f"https://www.facebook.com/{PAGE_ID}", timeout=30000)
+    time.sleep(5)
+
+    # Step 1: Click composer via JS
+    page.evaluate('''() => {
+        const els = document.querySelectorAll('[role="button"]');
+        for (const el of els) {
+            if (el.textContent.includes("คุณกำลังคิดอะไรอยู่")) {
+                el.click();
+                break;
+            }
+        }
+    }''')
+    print("✅ Clicked: คุณกำลังคิดอะไรอยู่")
+    time.sleep(2)
+
+    # Step 2: Type message via JS
+    page.evaluate(f'''() => {{
+        const els = document.querySelectorAll('[contenteditable="true"]');
+        for (const el of els) {{
+            if (el.offsetParent !== null) {{
+                el.textContent = "{message}";
+                el.dispatchEvent(new Event('input', {{ bubbles: true }}));
+                break;
+            }}
+        }}
+    }}''')
+    print(f"✅ Typed: {message}")
+    time.sleep(1)
+
+    # Step 3: Click "รูปภาพ/วิดีโอ" via JS
+    page.evaluate('''() => {
+        const els = document.querySelectorAll('[role="button"]');
+        for (const el of els) {
+            if (el.textContent.includes("รูปภาพ/วิดีโอ")) {
+                el.click();
+                break;
+            }
+        }
+    }''')
+    print("✅ Clicked: รูปภาพ/วิดีโอ")
+    time.sleep(2)
+
+    # Step 4: Upload image
+    try:
+        file_input = page.locator('input[type="file"]').first
+        if file_input.is_visible():
+            file_input.set_input_files(image_path)
+            print(f"✅ Uploaded: {image_path}")
+            time.sleep(4)
+    except Exception as e:
+        print(f"ERR upload: {e}")
+
+    # Step 5: Click "ถัดไป" via JS
+    page.evaluate('''() => {
+        const els = document.querySelectorAll('[role="button"]');
+        for (const el of els) {
+            if (el.textContent === "ถัดไป") {
+                el.click();
+                break;
+            }
+        }
+    }''')
+    print("✅ Clicked: ถัดไป")
+    time.sleep(3)
+
+    # Step 6: Click "ไม่ใช่ตอนนี้" (WhatsApp dialog) via JS
+    page.evaluate('''() => {
+        const els = document.querySelectorAll('[role="button"]');
+        for (const el of els) {
+            if (el.textContent.includes("ไม่ใช่ตอนนี้")) {
+                el.click();
+                break;
+            }
+        }
+    }''')
+    print("✅ Clicked: ไม่ใช่ตอนนี้")
+    time.sleep(2)
+
+    # Step 7: Click "สร้างโพสต์" via JS
+    page.evaluate('''() => {
+        const els = document.querySelectorAll('[role="button"]');
+        for (const el of els) {
+            if (el.textContent === "สร้างโพสต์") {
+                el.click();
+                break;
+            }
+        }
+    }''')
+    print("✅ Clicked: สร้างโพสต์")
+    time.sleep(3)
+    print("✅ Posted!")
+
+    browser.close()
+    print("Done")

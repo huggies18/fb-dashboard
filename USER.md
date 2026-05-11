@@ -1,17 +1,19 @@
 # USER.md - About Your Human
 
-_Learn about the person you're helping. Update this as you go._
-
-- **Name:**
-- **What to call them:**
-- **Pronouns:** _(optional)_
-- **Timezone:**
-- **Notes:**
+- **Name:** Tibodin Inthorn
+- **What to call them:** Tibodin (or just ปู call them "พี่" if natural)
+- **Pronouns:** he/him (based on context)
+- **Timezone:** UTC+7 (Thailand)
+- **Notes:** Active in Thai language; manages Facebook lead scraping for solar cell business
 
 ## Context
 
-_(What do they care about? What projects are they working on? What annoys them? What makes them laugh? Build this over time.)_
+- Runs Facebook lead scraper for Thai solar cell industry
+- Uses commands: `/run`, `/run_infi [target]`
+- Sends reports to Telegram: Tibodin (6780942246) + Nick (8698062232)
+- Prefers step-by-step format in Thai
+- Cookie for Facebook needs manual replacement when expired
 
 ---
 
-The more you know, the better you can help. But remember — you're learning about a person, not building a dossier. Respect the difference.
+_Updated: 2026-04-28_

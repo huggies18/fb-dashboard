@@ -1,0 +1,50 @@
+# Facebook/ Telegram tokens & secrets
+*_token*.json
+*_session*.json
+fb_cookies.json
+fb_session*.json
+graph_api_config.json
+proxy_config.json
+
+# Logs
+*.log
+*.log.*
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Debug screenshots & HTML
+debug_*.png
+debug_*.html
+
+# CSVs (exported data)
+csv_exports/
+
+# Leads & pending data
+leads/
+pending/
+
+# Environment files
+.env
+.env.*
+*.env
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Image files
+*.jpg
+*.jpeg
+*.png
+!reference_*.jpg
+
+# Large files
+bot.log

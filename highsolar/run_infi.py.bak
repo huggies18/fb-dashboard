@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+"""
+/run_infi [Tibodin|Nick|ทุกคน] - Continuous workflow
+====================================================
+- Run /run workflow
+- Wait 2-3 minutes
+- Repeat forever
+- Send to admin based on argument
+"""
+
+import sys
+sys.path.insert(0, '/root/.openclaw/workspace/facebook-scraper')
+import subprocess
+import time
+import asyncio
+from datetime import datetime, timedelta
+from telegram import Bot
+
+BOT_TOKEN = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
+ALL_ADMINS = {
+    'Tibodin': [6780942246],
+    'Nick': [8698062232],
+    'Noty': [8641112117],
+    'ทุกคน': [6780942246, 8698062232, 8641112117]
+}
+DEFAULT_TARGET = 'ทุกคน'
+THAI_OFFSET = timedelta(hours=7)
+
+def thai_time_str():
+    return (datetime.now() + THAI_OFFSET).strftime("%H:%M:%S")
+
+async def send_telegram(msg, target_ids):
+    bot = Bot(token=BOT_TOKEN)
+    for uid in target_ids:
+        await bot.send_message(chat_id=uid, text=msg)
+
+async def main():
+    # Get target from command line
+    target = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_TARGET
+    target_ids = ALL_ADMINS.get(target, ALL_ADMINS[DEFAULT_TARGET])
+    
+    print("="*60)
+    print(f"[{thai_time_str()}] 🚀 /run_infi - Continuous Workflow")
+    print(f"📤 ส่งไป: {target}")
+    print("="*60)
+    
+    await send_telegram(f"🔄 /run_infi เริ่มทำงาน\n📤 ส่งไป: {target}\n⏰ เริ่ม: {thai_time_str()}\n🔁 รันทุก 2-3 นาที", target_ids)
+    
+    count = 0
+    while True:
+        count += 1
+        print(f"\n[{thai_time_str()}] === รอบที่ {count} ===")
+        
+        # Run /run workflow with target
+        try:
+            env = {'TARGET': target}
+            result = subprocess.run(
+                ['python3', 'run_workflow.py', target],
+                cwd='/root/.openclaw/workspace/facebook-scraper',
+                capture_output=True,
+                text=True,
+                timeout=1200,
+                env={**subprocess.os.environ, 'TARGET': target}
+            )
+            
+            if result.returncode == 0:
+                print(f"[{thai_time_str()}] ✅ รอบที่ {count} เสร็จ")
+                await send_telegram(f"✅ รอบที่ {count} เสร็จ", target_ids)
+            else:
+                print(f"[{thai_time_str()}] ❌ รอบที่ {count} ผิดพลาด")
+                await send_telegram(f"❌ รอบที่ {count} ผิดพลาด", target_ids)
+        
+        except Exception as e:
+            print(f"[{thai_time_str()}] ❌ Error: {e}")
+            await send_telegram(f"❌ รอบที่ {count} ผิดพลาด: {str(e)[:100]}", target_ids)
+        
+        # Wait 2-3 minutes
+        wait_min = 2
+        wait_max = 3
+        wait_secs = wait_min * 60 + (wait_max - wait_min) * 60 * (time.time() % 1)
+        print(f"[{thai_time_str()}] ⏳ พัก {wait_min}-{wait_max} นาที...")
+        time.sleep(wait_secs)
+
+if __name__ == "__main__":
+    asyncio.run(main())

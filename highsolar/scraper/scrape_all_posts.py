@@ -32,6 +32,43 @@ def load_cookies():
     except:
         return []
 
+def load_proxy_fallback():
+    """Load fallback proxy from proxy_config.json"""
+    try:
+        with open('proxy_config.json', 'r') as f:
+            config = json.load(f)
+            proxies = config.get('proxies', [])
+            for p in proxies:
+                if p.get('status') == 'backup':
+                    return {
+                        'type': p.get('type', 'socks5'),
+                        'server': p['server'],
+                        'port': p['port'],
+                        'username': p.get('username'),
+                        'password': p.get('password')
+                    }
+    except:
+        pass
+    return None
+
+def build_proxy_args(proxy_config):
+    """Build proxy args dict from config"""
+    proxy_args = {}
+    if proxy_config:
+        proxy_type = proxy_config.get('type', 'http')
+        if proxy_type == 'socks5':
+            server_url = f"socks5://{proxy_config['server']}:{proxy_config['port']}"
+        elif proxy_type == 'socks4':
+            server_url = f"socks4://{proxy_config['server']}:{proxy_config['port']}"
+        else:
+            server_url = f"http://{proxy_config['server']}:{proxy_config['port']}"
+        
+        proxy_args['proxy'] = {'server': server_url}
+        if proxy_config.get('username') and proxy_config.get('password'):
+            proxy_args['proxy']['username'] = proxy_config['username']
+            proxy_args['proxy']['password'] = proxy_config['password']
+    return proxy_args
+
 SEEN_URLS_FILE = '/root/.openclaw/workspace/highsolar/scraper/seen_urls.json'
 
 def load_seen_urls():
@@ -176,6 +213,25 @@ def main():
         log("❌ No cookies found")
         return
     
+    # Try primary proxy first, fallback if primary fails
+    primary_proxy = None
+    try:
+        with open('proxy_config.json', 'r') as f:
+            config = json.load(f)
+            proxies = config.get('proxies', [])
+            for p in proxies:
+                if p.get('status') == 'active':
+                    primary_proxy = {
+                        'type': p.get('type', 'socks5'),
+                        'server': p['server'],
+                        'port': p['port'],
+                        'username': p.get('username'),
+                        'password': p.get('password')
+                    }
+                    break
+    except:
+        pass
+    
     # Load seen_urls for dedup
     seen_urls = load_seen_urls()
     log(f"📂 โหลด URL ที่เคย scrape แล้ว: {len(seen_urls)} URLs")
@@ -188,6 +244,11 @@ def main():
             headless=True,
             args=['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
         )
+        
+        # Use primary proxy if available
+        if primary_proxy:
+            proxy_args = build_proxy_args(primary_proxy)
+            log(f"Using primary proxy: {primary_proxy['server']}:{primary_proxy['port']}")
         
         # Load proxy from proxy_config.json
         proxy_config = None
@@ -208,22 +269,9 @@ def main():
         except Exception as e:
             print(f"Proxy load error: {e}")
         
-        # Build proxy args
-        proxy_args = {}
+        proxy_args = build_proxy_args(proxy_config)
         if proxy_config:
-            proxy_type = proxy_config.get('type', 'http')
-            if proxy_type == 'socks5':
-                server_url = f"socks5://{proxy_config['server']}:{proxy_config['port']}"
-            elif proxy_type == 'socks4':
-                server_url = f"socks4://{proxy_config['server']}:{proxy_config['port']}"
-            else:
-                server_url = f"http://{proxy_config['server']}:{proxy_config['port']}"
-            
-            proxy_args['proxy'] = {'server': server_url}
-            if proxy_config.get('username') and proxy_config.get('password'):
-                proxy_args['proxy']['username'] = proxy_config['username']
-                proxy_args['proxy']['password'] = proxy_config['password']
-            print(f"Using proxy: {proxy_config['server']}:{proxy_config['port']}")
+            print(f"Using proxy (primary): {proxy_config['server']}:{proxy_config['port']}")
         
         ctx = browser.new_context(
             viewport={"width": 1920, "height": 1080},
@@ -245,6 +293,27 @@ def main():
                 log(f"    ❌ Error: {e}")
             
             time.sleep(random.uniform(1, 2))
+        
+        # Fallback: check if we got very few posts - retry with fallback proxy
+        if len(all_posts) < 3:
+            fallback_proxy = load_proxy_fallback()
+            if fallback_proxy:
+                print(f"Few posts ({len(all_posts)}), retrying with fallback proxy...")
+                browser.close()
+                
+                ctx = browser.new_context(
+                    viewport={"width": 1920, "height": 1080},
+                    user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    **build_proxy_args(fallback_proxy)
+                )
+                ctx.add_cookies(cookies)
+                page = ctx.new_page()
+                
+                page.goto(f"https://www.facebook.com/groups/{group_id}", timeout=45000)
+                time.sleep(random.uniform(1.5, 3))
+                
+                # Re-scrape this group with fallback
+                scrape_group_all_posts(page, group_id, all_posts, seen_urls, stats)
         
         browser.close()
     

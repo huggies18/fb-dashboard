@@ -35,7 +35,7 @@ BOT_TOKEN_OLD = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
 BOT_TOKEN_NOTY = '8641112117:AAFokLi4gAvfqSUPjBz2AqUyGceAsX8M5CE'
 BOT_TOKEN_NEW = '8690841708:AAHAtvAFc2SYGHVubVGq1DEAyPpmyvcguY8'
 BOT_TOKEN = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
-ADMIN_USER_IDS = [6780942246, 8698062232, 6780942246]  # Tibodin, Nick, Noty(→Tibodin)
+ADMIN_USER_IDS = [6780942246, 8698062232]  # Tibodin, Nick
 
 # Override via environment variable (set by run_infi.py) or command line argument
 _target = os.environ.get('TARGET', '')

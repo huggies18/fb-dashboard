@@ -58,7 +58,7 @@ def minimax_analyze(post_text, post_url="unknown", group_id="unknown"):
             method='POST'
         )
         
-        with urllib.request.urlopen(req, timeout=25) as response:
+        with urllib.request.urlopen(req, timeout=60) as response:
             result = json.loads(response.read().decode('utf-8'))
             
             # Extract text from content blocks

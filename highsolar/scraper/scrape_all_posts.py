@@ -111,8 +111,11 @@ def scrape_group_all_posts(page, group_id, all_posts, seen_urls, stats):
     page.goto(f"https://www.facebook.com/groups/{group_id}", timeout=45000)
     time.sleep(random.uniform(1.5, 3))  # Wait before scroll like human
     
-    scrolls = random.randint(3, 5)  # สุ่ม 3-5 ครั้ง
+    scrolls = random.randint(8, 13)  # 8-13 ครั้ง
     log(f"📂 Group: {group_id} | Scrolls: {scrolls}")
+    
+    # Track new posts per scroll
+    scroll_new_counts = []
     
     for scroll_num in range(scrolls):
         page.mouse.wheel(0, random.randint(500, 1000))
@@ -137,6 +140,9 @@ def scrape_group_all_posts(page, group_id, all_posts, seen_urls, stats):
             except:
                 continue
         
+        new_in_scroll = 0
+        dup_in_scroll = 0
+        
         for post in posts:
             try:
                 post_url = None
@@ -152,11 +158,13 @@ def scrape_group_all_posts(page, group_id, all_posts, seen_urls, stats):
                 
                 stats['total_found'] += 1
                 
-                # ✅ Skip duplicate URLs
+                # ✅ Skip URLs already seen in PREVIOUS scrape runs (cross-run dedup only)
                 if post_url in seen_urls:
                     stats['duplicates'] += 1
+                    dup_in_scroll += 1
                     continue
-                seen_urls.add(post_url)
+                seen_urls.add(post_url)  # เก็บไว้สำหรับข้ามรอบหน้า
+                new_in_scroll += 1
                 
                 msg = ""
                 for sel in ['div[data-ad-preview="message"]', 'div[dir="auto"]', 'span[dir="auto"]']:
@@ -195,7 +203,17 @@ def scrape_group_all_posts(page, group_id, all_posts, seen_urls, stats):
             except Exception as e:
                 continue
         
+        scroll_new_counts.append(new_in_scroll)
+        
+        # 🔧 Smart scroll: ถ้าเจอแต่ duplicate → พยายาม scroll ต่อจนถึง max
+        if new_in_scroll == 0 and dup_in_scroll > 0 and scroll_num < scrolls - 1:
+            log(f"    ⚠️  Scroll {scroll_num+1}: เจอแต่ duplicate ({dup_in_scroll}) → พยายาม scroll ต่อ...")
+        
         time.sleep(1)  # หลังดึงโพส
+    
+    # 📊 สรุป scroll ของกลุ่มนี้
+    total_new = sum(scroll_new_counts)
+    log(f"    📈 Group {group_id}: new={total_new}, scrolls={scrolls}")
     
     return all_posts
 

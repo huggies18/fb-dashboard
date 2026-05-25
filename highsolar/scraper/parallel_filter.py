@@ -70,7 +70,7 @@ def analyze_post(post):
             method='POST'
         )
         
-        with urllib.request.urlopen(req, timeout=30) as response:
+        with urllib.request.urlopen(req, timeout=60) as response:
             result = json.loads(response.read().decode('utf-8'))
             
             # Extract text from content blocks

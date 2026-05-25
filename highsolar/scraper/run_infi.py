@@ -80,11 +80,6 @@ def main():
                 print(f"[{thai_time_str()}] ❌ รอบที่ {count} failed")
                 await send_telegram(f"❌ จบรอบที่ {count} - ผิดพลาด", target)
             
-            # Clear seen_urls after each cycle
-            with open(SEEN_URLS_FILE, 'w') as f:
-                f.write('[]')
-            print(f"[{thai_time_str()}] 🗑️ Cleared seen_urls.json")
-            
             # Wait 5-6 minutes
             wait = random.uniform(300, 360)
             print(f"[{thai_time_str()}] 💤 รอ {wait:.0f}วินาที ก่อนรอบต่อไป")

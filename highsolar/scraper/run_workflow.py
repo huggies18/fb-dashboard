@@ -168,7 +168,7 @@ async def step2_filter(posts):
         cwd='/root/.openclaw/workspace/highsolar/scraper',
         capture_output=True,
         text=True,
-        timeout=300
+        timeout=600
     )
     
     if result.returncode != 0:
@@ -246,14 +246,6 @@ async def main():
     print(f"   Lead: {len(leads)}")
     print(f"   Rejected: {len(not_leads)}")
     print("="*60)
-    
-    await send_telegram(f"✅ /run เสร็จสิ้น!\n📥 Step 1: รวม {raw_total} โพส, ซ้ำ {duplicate_count}, เหลือ {len(posts)} โพส\n🔍 Step 2: Lead {len(leads)} โพส (จาก {len(posts)} โพสที่ไม่ซ้ำ)")
-    
-    # Clear seen_urls after workflow completes
-    SEEN_URLS_FILE = '/root/.openclaw/workspace/highsolar/scraper/seen_urls.json'
-    with open(SEEN_URLS_FILE, 'w') as f:
-        f.write('[]')
-    print(f"[{thai_time_str()}] 🗑️ Cleared seen_urls.json")
 
 if __name__ == "__main__":
     asyncio.run(main())

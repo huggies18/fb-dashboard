@@ -1,36 +1,59 @@
 #!/usr/bin/env python3
 """
-/run - Full Workflow: Scrape → Filter → Report to Telegram
-==========================================================
-Step 1: Scrape all posts from 6 groups → CSV
-Step 2: Filter with MiniMax AI → CSV with leads/rejected
-Send results to NotiBot (Telegram)
+ขั้นตอนการทำงาน:
+
+1️⃣ SCRAPE (run_workflow.py)
+ - เปิด Chrome (Selenium)
+ - Login Facebook
+ - ไปแต่ละกลุ่ม
+ - Scroll เก็บโพส (5-7 scrolls)
+ - บันทึก: all_posts.json
+
+2️⃣ FILTER (parallel_filter.py)
+ - อ่าน all_posts.json
+ - ส่งแต่ละโพสให้ MiniMax AI ตัดสิน
+ - ถ้าเป็น buyer lead → เก็บไว้
+ - ผลลัพธ์: filter_result.json
+
+3️⃣ REPORT (Telegram)
+ - ส่ง lead ที่เจอไปหา Tibodin/Nick/Noty
 """
 
 import sys
-sys.path.insert(0, '/root/.openclaw/workspace/facebook-scraper')
+sys.path.insert(0, '/root/.openclaw/workspace/highsolar/scraper')
 
 import os, json, csv, time, asyncio
 from datetime import datetime, timedelta
 from telegram import Bot
 
 # Config
-SCRAPER_LOG = '/root/.openclaw/workspace/facebook-scraper/scrape_all.log'
-ALL_POSTS_FILE = '/root/.openclaw/workspace/facebook-scraper/all_posts.json'
-RESULT_FILE = '/root/.openclaw/workspace/facebook-scraper/filter_result.json'
-CSV_DIR = '/root/.openclaw/workspace/facebook-scraper/csv_exports'
+SCRAPER_LOG = '/root/.openclaw/workspace/highsolar/scraper/scrape_all.log'
+ALL_POSTS_FILE = '/root/.openclaw/workspace/highsolar/scraper/all_posts.json'
+RESULT_FILE = '/root/.openclaw/workspace/highsolar/scraper/filter_result.json'
+CSV_DIR = '/root/.openclaw/workspace/highsolar/scraper/csv_exports'
+BOT_TOKEN_OLD = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
+BOT_TOKEN_NOTY = '8641112117:AAFokLi4gAvfqSUPjBz2AqUyGceAsX8M5CE'
+BOT_TOKEN_NEW = '8690841708:AAHAtvAFc2SYGHVubVGq1DEAyPpmyvcguY8'
 BOT_TOKEN = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
-ADMIN_USER_IDS = [6780942246, 8698062232, 8641112117]  # Tibodin, Nick, Noty
+ADMIN_USER_IDS = [6780942246, 8698062232]  # Tibodin, Nick
 
-# Override via environment variable (set by run_infi.py)
-import os
+# Override via environment variable (set by run_infi.py) or command line argument
 _target = os.environ.get('TARGET', '')
+if not _target and len(sys.argv) > 1:
+    _target = sys.argv[1]
+
 if _target == 'Tibodin':
     ADMIN_USER_IDS = [6780942246]
+    BOT_TOKEN = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
 elif _target == 'Nick':
     ADMIN_USER_IDS = [8698062232]
+    BOT_TOKEN = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
 elif _target == 'Noty':
-    ADMIN_USER_IDS = [8641112117]
+    ADMIN_USER_IDS = [6780942246]  # ส่งไปหา Tibodin
+    BOT_TOKEN = '8641112117:AAFokLi4gAvfqSUPjBz2AqUyGceAsX8M5CE'    # ใช้ Noty bot ส่ง
+elif _target == 'Tibodin2':
+    ADMIN_USER_IDS = [6780942246]  # ส่งไปหา Tibodin
+    BOT_TOKEN = '8690841708:AAHAtvAFc2SYGHVubVGq1DEAyPpmyvcguY8'    # ใช้ bot ใหม่ส่ง
 THAI_OFFSET = timedelta(hours=7)
 
 from ai_minimax_filter import minimax_analyze
@@ -60,14 +83,14 @@ async def send_csv(caption, filepath, filename):
 async def step1_scrape():
     """Step 1: Scrape all posts"""
     print(f"[{thai_time_str()}] 📥 ขั้นตอน 1 - Scrape ทุกโพส...")
-    await send_telegram(f"🔄 ขั้นตอน 1 เวลา {thai_time_str()} UTC+7 - กำลัง scrape โพสจาก 6 กลุ่ม...")
+    await send_telegram(f"🔄 ขั้นตอน 1 เวลา {thai_time_str()} UTC+7 - กำลัง scrape โพสจาก 13 กลุ่ม บริษัท HighSolar...")
     
     # Clean old data
     if os.path.exists(ALL_POSTS_FILE):
         os.remove(ALL_POSTS_FILE)
     
     # Run scraper in background
-    os.system('cd /root/.openclaw/workspace/facebook-scraper && nohup python3 scrape_all_posts.py > /dev/null 2>&1 &')
+    os.system('cd /root/.openclaw/workspace/highsolar/scraper && nohup python3 scrape_all_posts.py > /dev/null 2>&1 &')
     
     # Wait for scrape to complete
     max_wait = 600  # 10 minutes
@@ -82,6 +105,9 @@ async def step1_scrape():
                 if 'TOTAL:' in content and 'Saved to:' in content:
                     break
     
+    # Wait a bit more for scraper to finish writing log
+    await asyncio.sleep(2)
+    
     # Load posts
     if not os.path.exists(ALL_POSTS_FILE):
         print(f"[{thai_time_str()}] ❌ Scrape failed - no posts file")
@@ -91,7 +117,19 @@ async def step1_scrape():
     with open(ALL_POSTS_FILE, 'r', encoding='utf-8') as f:
         posts = json.load(f)
     
-    print(f"[{thai_time_str()}] ✅ Scrape เสร็จ - ได้ {len(posts)} โพส")
+    # Parse raw/duplicate counts from log AFTER scrape completes
+    raw_total = 0
+    duplicate_count = 0
+    if os.path.exists(SCRAPER_LOG):
+        with open(SCRAPER_LOG, 'r') as f:
+            content = f.read()
+        import re
+        m = re.search(r'เก็บทุกโพสจำนวน:\s*(\d+)\s*โพส\s*ซ้ำ\s*(\d+)', content)
+        if m:
+            raw_total = int(m.group(1))
+            duplicate_count = int(m.group(2))
+    
+    print(f"[{thai_time_str()}] ✅ Scrape เสร็จ - รวม {raw_total} โพส, ซ้ำ {duplicate_count} โพส, เหลือ {len(posts)} โพส (ไม่ filter)")
     
     # ⚠️ Cookie check - ถ้าโพสน้อยมากอาจหมด
     if len(posts) < 5:
@@ -110,10 +148,10 @@ async def step1_scrape():
             w.writerow([i, p.get('group',''), p.get('url',''), p.get('message','')[:200], p.get('time',''), p.get('scraped_at','')])
     
     # Send Step 1 CSV
-    await send_csv(f"📥 ขั้นตอน 1 - เก็บทุกโพส: {len(posts)} โพส (ไม่ filter)", csv_path, f'step1_scrape_{ts}.csv')
-    await send_telegram(f"✅ ขั้นตอน 1 เวลา {thai_time_str()} UTC+7 - เก็บได้ {len(posts)} โพส\n\n🔄 กำลังดำเนินขั้นตอน 2...")
+    await send_csv(f"📥 ขั้นตอน 1 - รวม {raw_total} โพส, ซ้ำ {duplicate_count}, เหลือ {len(posts)} โพส (ไม่ filter)", csv_path, f'step1_scrape_{ts}.csv')
+    await send_telegram(f"✅ ขั้นตอน 1 เวลา {thai_time_str()} UTC+7 - รวม {raw_total} โพส, ซ้ำ {duplicate_count}, เหลือ {len(posts)} โพส\n\n🔄 กำลังดำเนินขั้นตอน 2...")
     
-    return posts
+    return posts, raw_total, duplicate_count
 
 async def step2_filter(posts):
     """Step 2: Filter posts with MiniMax AI (Parallel)"""
@@ -127,10 +165,10 @@ async def step2_filter(posts):
     import subprocess
     result = subprocess.run(
         ['python3', 'parallel_filter.py'],
-        cwd='/root/.openclaw/workspace/facebook-scraper',
+        cwd='/root/.openclaw/workspace/highsolar/scraper',
         capture_output=True,
         text=True,
-        timeout=300
+        timeout=600
     )
     
     if result.returncode != 0:
@@ -180,7 +218,7 @@ async def step2_filter(posts):
             
             lead_lines.append(f"{i}. {reason} score:{score}\n 📝 \"{msg_text}...\"\n 🔗 {url}")
         
-        combined = "✅ Leads ที่เจอ (9 ราย):\n\n" + "\n\n".join(lead_lines)
+        combined = f"✅ Leads ที่เจอ ({len(leads)} ราย):\n\n" + "\n\n".join(lead_lines)
         if len(leads) > 10:
             combined += f"\n\n...และอีก {len(leads)-10} ราย (ดูใน CSV)"
         await send_telegram(combined)
@@ -193,10 +231,11 @@ async def main():
     print("="*60)
     
     # Step 1: Scrape
-    posts = await step1_scrape()
-    if not posts:
+    result = await step1_scrape()
+    if not result:
         print("❌ หยุดการทำงาน - Scrape ล้มเหลว")
         return
+    posts, raw_total, duplicate_count = result
     
     # Step 2: Filter
     leads, not_leads = await step2_filter(posts)
@@ -207,8 +246,6 @@ async def main():
     print(f"   Lead: {len(leads)}")
     print(f"   Rejected: {len(not_leads)}")
     print("="*60)
-    
-    await send_telegram(f"✅ /run เสร็จสิ้น!\n📊 สรุป: {len(posts)} โพส → {len(leads)} leads")
 
 if __name__ == "__main__":
     asyncio.run(main())

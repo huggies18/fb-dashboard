@@ -20,14 +20,12 @@ THAI_OFFSET = timedelta(hours=7)
 # Bot Tokens
 BOT_TOKEN_OLD = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
 BOT_TOKEN_NOTY = '8641112117:AAFokLi4gAvfqSUPjBz2AqUyGceAsX8M5CE'
-BOT_TOKEN_NOTIBOT = '8662942478:AAFAPhgEC4WI6lM6FCdsQKr7h_o0gbavPgw'
 
 # Admin IDs
 ADMIN_IDS = {
     'Tibodin': 6780942246,
     'Nick': 8698062232,
     'Noty': 6780942246,  # ส่งไป Tibodin แต่ใช้ NotiBot
-    'Kee': 8868315905,   # ส่งไป Kee ใช้ NotiBot
 }
 
 # Token per target
@@ -35,7 +33,6 @@ BOT_TOKEN = {
     'Tibodin': BOT_TOKEN_OLD,
     'Nick': BOT_TOKEN_OLD,
     'Noty': BOT_TOKEN_NOTY,
-    'Kee': BOT_TOKEN_NOTIBOT,
 }
 
 SEEN_URLS_FILE = '/root/.openclaw/workspace/highsolar/scraper/seen_urls.json'
@@ -53,7 +50,7 @@ def main():
     # Format: /run_infi scrap -highsolar -Noty
     target = 'Tibodin'
     for arg in sys.argv:
-        if arg in ['Tibodin', 'Nick', 'Noty', 'Kee']:
+        if arg in ['Tibodin', 'Nick', 'Noty']:
             target = arg
             break
     

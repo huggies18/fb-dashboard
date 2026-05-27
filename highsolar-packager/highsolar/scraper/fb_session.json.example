@@ -1,0 +1,74 @@
+{
+  "cookies": [
+    {
+      "domain": ".facebook.com",
+      "expirationDate": 9999999999,
+      "hostOnly": false,
+      "httpOnly": false,
+      "name": "c_user",
+      "path": "/",
+      "sameSite": "Lax",
+      "secure": true,
+      "session": false,
+      "storeId": "0",
+      "value": "YOUR_FACEBOOK_USER_ID",
+      "id": 1
+    },
+    {
+      "domain": ".facebook.com",
+      "expirationDate": 9999999999,
+      "hostOnly": false,
+      "httpOnly": true,
+      "name": "datr",
+      "path": "/",
+      "sameSite": "Lax",
+      "secure": true,
+      "session": false,
+      "storeId": "0",
+      "value": "YOUR_DATR_COOKIE",
+      "id": 2
+    },
+    {
+      "domain": ".facebook.com",
+      "expirationDate": 9999999999,
+      "hostOnly": false,
+      "httpOnly": true,
+      "name": "fr",
+      "path": "/",
+      "sameSite": "Lax",
+      "secure": true,
+      "session": false,
+      "storeId": "0",
+      "value": "YOUR_FR_COOKIE",
+      "id": 3
+    },
+    {
+      "domain": ".facebook.com",
+      "expirationDate": 9999999999,
+      "hostOnly": false,
+      "httpOnly": true,
+      "name": "sb",
+      "path": "/",
+      "sameSite": "Lax",
+      "secure": true,
+      "session": false,
+      "storeId": "0",
+      "value": "YOUR_SB_COOKIE",
+      "id": 4
+    },
+    {
+      "domain": ".facebook.com",
+      "expirationDate": 9999999999,
+      "hostOnly": false,
+      "httpOnly": true,
+      "name": "xs",
+      "path": "/",
+      "sameSite": "Lax",
+      "secure": true,
+      "session": false,
+      "storeId": "0",
+      "value": "YOUR_XS_COOKIE",
+      "id": 5
+    }
+  ]
+}

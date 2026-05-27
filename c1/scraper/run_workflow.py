@@ -33,6 +33,7 @@ RESULT_FILE = '/root/.openclaw/workspace/c1/scraper/filter_result.json'
 CSV_DIR = '/root/.openclaw/workspace/c1/scraper/csv_exports'
 BOT_TOKEN_OLD = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
 BOT_TOKEN_NOTY = '8641111669:AAEf倪9V_k_82gBScTPsp8yncksM5CE'
+BOT_TOKEN_NOTIBOT = '8662942478:AAFAPhgEC4WI6lM6FCdsQKr7h_o0gbavPgw'
 BOT_TOKEN = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
 ADMIN_USER_IDS = [6780942246, 8698062232, 6780942246]  # Tibodin, Nick, Noty(→Tibodin)
 
@@ -50,6 +51,9 @@ elif _target == 'Nick':
 elif _target == 'Noty':
     ADMIN_USER_IDS = [6780942246]  # ส่งไปหา Tibodin
     BOT_TOKEN = '8641111669:AAEf倪9V_k_82gBScTPsp8yncksM5CE'    # ใช้ Noty bot ส่ง
+elif _target == 'Kee':
+    ADMIN_USER_IDS = [8868315905]  # ส่งไปหา Kee
+    BOT_TOKEN = '8662942478:AAFAPhgEC4WI6lM6FCdsQKr7h_o0gbavPgw'    # ใช้ NotiBot ส่ง
 THAI_OFFSET = timedelta(hours=7)
 
 from ai_minimax_filter import minimax_analyze

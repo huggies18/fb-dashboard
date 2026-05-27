@@ -1,0 +1,25 @@
+{
+  "proxies": [
+    {
+      "name": "primary",
+      "type": "socks5",
+      "server": "YOUR_PROXY_SERVER",
+      "port": 10000,
+      "username": "YOUR_PROXY_USERNAME",
+      "password": "YOUR_PROXY_PASSWORD",
+      "status": "active",
+      "note": "Proxy หลัก"
+    },
+    {
+      "name": "fallback",
+      "type": "socks5",
+      "server": "YOUR_PROXY_SERVER",
+      "port": 823,
+      "username": "YOUR_PROXY_USERNAME",
+      "password": "YOUR_PROXY_PASSWORD",
+      "status": "backup",
+      "note": "Proxy สำรอง - ถ้าตัวหลักพัง"
+    }
+  ],
+  "note": "ถ้าไม่มี proxy สามารถลบไฟล์นี้หรือใช้ค่าว่างได้"
+}

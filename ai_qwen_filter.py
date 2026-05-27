@@ -74,6 +74,7 @@ def analyze_with_qwen(post_text, post_url, group_id):
                 'ai_used': 'qwen2.5:7b',
                 'ai_raw': ai_text
             }
+        
         except json.JSONDecodeError:
             # Fallback to simple parsing
             return {

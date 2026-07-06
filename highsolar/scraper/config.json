@@ -1,8 +1,27 @@
 {
     "groups": [
-        "163583739075033",
+        "1925997401002801",
         "383849116272497",
-        "1175667799741067"
+        "2317142971864047",
+        "thaisolarcell",
+        "1671213103178339",
+        "429829328127055",
+        "1049914571763738",
+        "278105266564882",
+        "763466071205875",
+        "473956404634218",
+        "300427817214285",
+        "264965324013436",
+        "185778725090915",
+        "242920475106307",
+        "163583739075033",
+        "1175667799741067",
+        "424490181779844",
+        "312145609339263",
+        "193808351965422",
+        "773192030070938",
+        "139218370071487",
+        "560054717969867"
     ],
     "keywords": [
         "solarcell",
@@ -17,9 +36,42 @@
         "หาร้าน",
         "ขอราคา"
     ],
-    "min_comment_length": 10,
-    "max_scrolls": 25,
-    "min_delay": 5,
-    "max_delay": 15,
-    "headless": true
+    "min_comment_length": 20,
+    "min_scrolls": 10,
+    "max_scrolls": 20,
+    "min_delay": 10,
+    "max_delay": 25,
+    "headless": true,
+    "telegram_targets": [
+        {
+            "name": "Kee",
+            "chat_id": 8868315905,
+            "bot_token": "8662942478:AAFAPhgEC4WI6lM6FCdsQKr7h_o0gbavPgw"
+        },
+        {
+            "name": "Tibodin",
+            "chat_id": 6780942246,
+            "bot_token": "8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw"
+        },
+        {
+            "name": "Nick",
+            "chat_id": 8698062232,
+            "bot_token": "8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw"
+        },
+        {
+            "name": "Noty",
+            "chat_id": 6780942246,
+            "bot_token": "8641112117:AAFokLi4gAvfqSUPjBz2AqUyGceAsX8M5CE"
+        },
+        {
+            "name": "Tibodin2",
+            "chat_id": 6780942246,
+            "bot_token": "8690841708:AAHAtvAFc2SYGHVubVGq1DEAyPpmyvcguY8"
+        },
+        {
+            "name": "realbot",
+            "chat_id": 6166966704,
+            "bot_token": "8978549178:AAFctjG7Qk8rgV1XesSd8bawE4b4cjYFDHk"
+        }
+    ]
 }

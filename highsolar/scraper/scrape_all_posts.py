@@ -9,16 +9,17 @@ import sys
 sys.path.insert(0, '.')
 
 import json, time, os, random
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from playwright.sync_api import sync_playwright
 
 THAI_OFFSET = timedelta(hours=7)
-LOG_FILE = '/root/.openclaw/workspace/highsolar/scraper/scrape_all.log'
-OUTPUT_FILE = '/root/.openclaw/workspace/highsolar/scraper/all_posts.json'
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+LOG_FILE = os.path.join(SCRIPT_DIR, 'scrape_all.log')
+OUTPUT_FILE = os.path.join(SCRIPT_DIR, 'all_posts.json')
 
 def log(msg):
     """Log to file"""
-    ts = (datetime.now() + THAI_OFFSET).strftime("%H:%M:%S")
+    ts = (datetime.now(timezone.utc) + THAI_OFFSET).strftime("%H:%M:%S")
     line = f"[{ts}] {msg}"
     print(line)
     with open(LOG_FILE, 'a') as f:
@@ -26,16 +27,33 @@ def log(msg):
 
 def load_cookies():
     try:
-        with open('fb_session.json', 'r') as f:
+        with open(os.path.join(SCRIPT_DIR, 'fb_session.json'), 'r') as f:
             session = json.load(f)
-            return session.get('cookies', [])
+            raw_cookies = session.get('cookies', [])
+            
+            # Normalize cookies for Playwright compatibility
+            normalized_cookies = []
+            for c in raw_cookies:
+                nc = c.copy()
+                # Playwright expects sameSite to be exactly Strict, Lax, or None (capitalized)
+                same_site = nc.get('sameSite')
+                if same_site:
+                    same_site_str = str(same_site).strip().capitalize()
+                    if same_site_str == 'No_restriction':
+                        nc['sameSite'] = 'None'
+                    elif same_site_str in ['Strict', 'Lax', 'None']:
+                        nc['sameSite'] = same_site_str
+                    else:
+                        nc.pop('sameSite', None)
+                normalized_cookies.append(nc)
+            return normalized_cookies
     except:
         return []
 
 def load_proxy_fallback():
     """Load fallback proxy from proxy_config.json"""
     try:
-        with open('proxy_config.json', 'r') as f:
+        with open(os.path.join(SCRIPT_DIR, 'proxy_config.json'), 'r') as f:
             config = json.load(f)
             proxies = config.get('proxies', [])
             for p in proxies:
@@ -69,7 +87,7 @@ def build_proxy_args(proxy_config):
             proxy_args['proxy']['password'] = proxy_config['password']
     return proxy_args
 
-SEEN_URLS_FILE = '/root/.openclaw/workspace/highsolar/scraper/seen_urls.json'
+SEEN_URLS_FILE = os.path.join(SCRIPT_DIR, 'seen_urls.json')
 
 def load_seen_urls():
     """Load URLs that have been scraped before"""
@@ -105,13 +123,13 @@ GROUPS = [
     '242920475106307',   # HUAWEI INVERTER แชร์ความรู้ประสบการณ์
 ]
 
-def scrape_group_all_posts(page, group_id, all_posts, seen_urls, stats):
+def scrape_group_all_posts(page, group_id, all_posts, seen_urls, stats, min_scrolls=8, max_scrolls=13, min_delay=1.0, max_delay=2.5):
     """ดึงทุกโพสที่เจอ"""
     
     page.goto(f"https://www.facebook.com/groups/{group_id}", timeout=45000)
     time.sleep(random.uniform(1.5, 3))  # Wait before scroll like human
     
-    scrolls = random.randint(8, 13)  # 8-13 ครั้ง
+    scrolls = random.randint(min_scrolls, max_scrolls)  # กำหนดช่วง scrolls จาก config
     log(f"📂 Group: {group_id} | Scrolls: {scrolls}")
     
     # Track new posts per scroll
@@ -197,8 +215,9 @@ def scrape_group_all_posts(page, group_id, all_posts, seen_urls, stats):
                     'message': msg,
                     'group': group_id,
                     'time': post_time,
-                    'scraped_at': (datetime.now() + THAI_OFFSET).strftime('%Y-%m-%d %H:%M:%S')
+                    'scraped_at': (datetime.now(timezone.utc) + THAI_OFFSET).strftime('%Y-%m-%d %H:%M:%S')
                 })
+                log(f"    ✨ Found post: {msg[:60].strip().replace('\n', ' ')}... ({post_url})")
                 
             except Exception as e:
                 continue
@@ -226,6 +245,23 @@ def main():
     log("🚀 SCRAPER - ดึงทุกโพส (ไม่ filter)")
     log("="*60)
     
+    # Load config settings if available
+    config = {}
+    config_path = os.path.join(SCRIPT_DIR, 'config.json')
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+        except Exception as e:
+            log(f"⚠️ Cannot load config: {e}")
+
+    groups_to_scrape = config.get('groups', GROUPS)
+    min_scrolls = config.get('min_scrolls', 8)
+    max_scrolls = config.get('max_scrolls', 13)
+    min_delay = config.get('min_delay', 5)
+    max_delay = config.get('max_delay', 15)
+    headless_setting = config.get('headless', True)
+
     cookies = load_cookies()
     if not cookies:
         log("❌ No cookies found")
@@ -234,7 +270,7 @@ def main():
     # Try primary proxy first, fallback if primary fails
     primary_proxy = None
     try:
-        with open('proxy_config.json', 'r') as f:
+        with open(os.path.join(SCRIPT_DIR, 'proxy_config.json'), 'r') as f:
             config = json.load(f)
             proxies = config.get('proxies', [])
             for p in proxies:
@@ -259,7 +295,7 @@ def main():
     
     with sync_playwright() as p:
         browser = p.chromium.launch(
-            headless=True,
+            headless=headless_setting,
             args=['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
         )
         
@@ -271,7 +307,7 @@ def main():
         # Load proxy from proxy_config.json
         proxy_config = None
         try:
-            with open('proxy_config.json', 'r') as f:
+            with open(os.path.join(SCRIPT_DIR, 'proxy_config.json'), 'r') as f:
                 config = json.load(f)
                 proxies = config.get('proxies', [])
                 for p in proxies:
@@ -302,15 +338,19 @@ def main():
         page.goto("https://www.facebook.com", timeout=30000)
         time.sleep(1)
         
-        for group_id in GROUPS:
+        for group_id in groups_to_scrape:
             log(f"📂 Loading: {group_id}")
             try:
-                scrape_group_all_posts(page, group_id, all_posts, seen_urls, stats)
+                scrape_group_all_posts(
+                    page, group_id, all_posts, seen_urls, stats,
+                    min_scrolls=min_scrolls, max_scrolls=max_scrolls,
+                    min_delay=min_delay/5.0, max_delay=max_delay/5.0
+                )
                 log(f"    ✅ Total so far: {len(all_posts)} posts")
             except Exception as e:
                 log(f"    ❌ Error: {e}")
             
-            time.sleep(random.uniform(1, 2))
+            time.sleep(random.uniform(min_delay/5.0, max_delay/5.0))
         
         # Fallback: check if we got very few posts - retry with fallback proxy
         if len(all_posts) < 3:

@@ -20,17 +20,18 @@
 """
 
 import sys
-sys.path.insert(0, '/root/.openclaw/workspace/highsolar/scraper')
-
 import os, json, csv, time, asyncio
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from telegram import Bot
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, SCRIPT_DIR)
+
 # Config
-SCRAPER_LOG = '/root/.openclaw/workspace/highsolar/scraper/scrape_all.log'
-ALL_POSTS_FILE = '/root/.openclaw/workspace/highsolar/scraper/all_posts.json'
-RESULT_FILE = '/root/.openclaw/workspace/highsolar/scraper/filter_result.json'
-CSV_DIR = '/root/.openclaw/workspace/highsolar/scraper/csv_exports'
+SCRAPER_LOG = os.path.join(SCRIPT_DIR, 'scrape_all.log')
+ALL_POSTS_FILE = os.path.join(SCRIPT_DIR, 'all_posts.json')
+RESULT_FILE = os.path.join(SCRIPT_DIR, 'filter_result.json')
+CSV_DIR = os.path.join(SCRIPT_DIR, 'csv_exports')
 BOT_TOKEN_OLD = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
 BOT_TOKEN_NOTY = '8641112117:AAFokLi4gAvfqSUPjBz2AqUyGceAsX8M5CE'
 BOT_TOKEN_NOTIBOT = '8662942478:AAFAPhgEC4WI6lM6FCdsQKr7h_o0gbavPgw'
@@ -43,46 +44,78 @@ _target = os.environ.get('TARGET', '')
 if not _target and len(sys.argv) > 1:
     _target = sys.argv[1]
 
-if _target == 'Tibodin':
-    ADMIN_USER_IDS = [6780942246]
-    BOT_TOKEN = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
-elif _target == 'Nick':
-    ADMIN_USER_IDS = [8698062232]
-    BOT_TOKEN = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
-elif _target == 'Noty':
-    ADMIN_USER_IDS = [6780942246]  # ส่งไปหา Tibodin
-    BOT_TOKEN = '8641112117:AAFokLi4gAvfqSUPjBz2AqUyGceAsX8M5CE'    # ใช้ Noty bot ส่ง
-elif _target == 'Tibodin2':
-    ADMIN_USER_IDS = [6780942246]  # ส่งไปหา Tibodin
-    BOT_TOKEN = '8690841708:AAHAtvAFc2SYGHVubVGq1DEAyPpmyvcguY8'    # ใช้ bot ใหม่ส่ง
-elif _target == 'Kee':
-    ADMIN_USER_IDS = [8868315905]  # ส่งไปหา Kee
-    BOT_TOKEN = '8662942478:AAFAPhgEC4WI6lM6FCdsQKr7h_o0gbavPgw'    # ใช้ NotiBot ส่ง
+# Default fallback values
+ADMIN_USER_IDS = [8868315905]  # Default: Kee
+BOT_TOKEN = '8662942478:AAFAPhgEC4WI6lM6FCdsQKr7h_o0gbavPgw'
+
+# Attempt to load from config.json dynamically
+config_loaded = False
+try:
+    config_path = os.path.join(SCRIPT_DIR, 'config.json')
+    if os.path.exists(config_path):
+        with open(config_path, 'r', encoding='utf-8') as f:
+            cfg = json.load(f)
+            targets_list = cfg.get('telegram_targets', [])
+            for t in targets_list:
+                if t.get('name') == _target:
+                    ADMIN_USER_IDS = [int(t.get('chat_id'))]
+                    BOT_TOKEN = t.get('bot_token')
+                    config_loaded = True
+                    break
+except Exception as e:
+    print(f"Error loading target configuration from config.json: {e}", flush=True)
+
+if not config_loaded:
+    if _target == 'Tibodin':
+        ADMIN_USER_IDS = [6780942246]
+        BOT_TOKEN = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
+    elif _target == 'Nick':
+        ADMIN_USER_IDS = [8698062232]
+        BOT_TOKEN = '8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw'
+    elif _target == 'Noty':
+        ADMIN_USER_IDS = [6780942246]  # ส่งไปหา Tibodin
+        BOT_TOKEN = '8641112117:AAFokLi4gAvfqSUPjBz2AqUyGceAsX8M5CE'    # ใช้ Noty bot ส่ง
+    elif _target == 'Tibodin2':
+        ADMIN_USER_IDS = [6780942246]  # ส่งไปหา Tibodin
+        BOT_TOKEN = '8690841708:AAHAtvAFc2SYGHVubVGq1DEAyPpmyvcguY8'    # ใช้ bot ใหม่ส่ง
+    elif _target == 'Kee':
+        ADMIN_USER_IDS = [8868315905]  # ส่งไปหา Kee
+        BOT_TOKEN = '8662942478:AAFAPhgEC4WI6lM6FCdsQKr7h_o0gbavPgw'    # ใช้ NotiBot ส่ง
 THAI_OFFSET = timedelta(hours=7)
 
 from ai_minimax_filter import minimax_analyze
 
 def thai_time_str():
-    return (datetime.now() + THAI_OFFSET).strftime("%H:%M:%S")
+    return (datetime.now(timezone.utc) + THAI_OFFSET).strftime("%H:%M:%S")
 
 def thai_now():
-    return (datetime.now() + THAI_OFFSET).strftime("%Y-%m-%d %H:%M:%S")
+    return (datetime.now(timezone.utc) + THAI_OFFSET).strftime("%Y-%m-%d %H:%M:%S")
+
+
+def python_command():
+    return 'py' if os.name == 'nt' else 'python3'
 
 async def send_telegram(msg):
-    bot = Bot(token=BOT_TOKEN)
-    for uid in ADMIN_USER_IDS:
-        await bot.send_message(chat_id=uid, text=msg)
+    try:
+        bot = Bot(token=BOT_TOKEN)
+        for uid in ADMIN_USER_IDS:
+            await bot.send_message(chat_id=uid, text=msg)
+    except Exception as e:
+        print(f"[{thai_time_str()}] ⚠️ Telegram error in send_telegram: {e}", flush=True)
 
 async def send_csv(caption, filepath, filename):
-    bot = Bot(token=BOT_TOKEN)
-    for uid in ADMIN_USER_IDS:
-        with open(filepath, 'rb') as f:
-            await bot.send_document(
-                chat_id=uid,
-                document=f,
-                filename=filename,
-                caption=caption
-            )
+    try:
+        bot = Bot(token=BOT_TOKEN)
+        for uid in ADMIN_USER_IDS:
+            with open(filepath, 'rb') as f:
+                await bot.send_document(
+                    chat_id=uid,
+                    document=f,
+                    filename=filename,
+                    caption=caption
+                )
+    except Exception as e:
+        print(f"[{thai_time_str()}] ⚠️ Telegram error in send_csv: {e}", flush=True)
 
 async def step1_scrape():
     """Step 1: Scrape all posts"""
@@ -93,24 +126,20 @@ async def step1_scrape():
     if os.path.exists(ALL_POSTS_FILE):
         os.remove(ALL_POSTS_FILE)
     
-    # Run scraper in background
-    os.system('cd /root/.openclaw/workspace/highsolar/scraper && nohup python3 scrape_all_posts.py > /dev/null 2>&1 &')
+    # Run scraper and pipe output directly to stdout in real time
+    import subprocess
+    process = subprocess.Popen(
+        [python_command(), '-u', 'scrape_all_posts.py'],
+        cwd=SCRIPT_DIR,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True
+    )
     
-    # Wait for scrape to complete
-    max_wait = 600  # 10 minutes
-    waited = 0
-    while waited < max_wait:
-        await asyncio.sleep(5)
-        waited += 5
+    for line in process.stdout:
+        print(line.strip(), flush=True)
         
-        if os.path.exists(SCRAPER_LOG):
-            with open(SCRAPER_LOG, 'r') as f:
-                content = f.read()
-                if 'TOTAL:' in content and 'Saved to:' in content:
-                    break
-    
-    # Wait a bit more for scraper to finish writing log
-    await asyncio.sleep(2)
+    process.wait()
     
     # Load posts
     if not os.path.exists(ALL_POSTS_FILE):
@@ -168,8 +197,8 @@ async def step2_filter(posts):
     # Run parallel_filter.py as subprocess
     import subprocess
     result = subprocess.run(
-        ['python3', 'parallel_filter.py'],
-        cwd='/root/.openclaw/workspace/highsolar/scraper',
+        [python_command(), 'parallel_filter.py'],
+        cwd=SCRIPT_DIR,
         capture_output=True,
         text=True,
         timeout=600

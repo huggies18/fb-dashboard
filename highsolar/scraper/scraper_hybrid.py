@@ -34,8 +34,9 @@ BROWSER_REUSE_LIMIT = 2
 WORKER_COUNT = 3
 DELAY_MIN = 2
 DELAY_MAX = 5
-LEADS_DIR = "/root/.openclaw/workspace/highsolar/scraper/leads"
-PENDING_DIR = "/root/.openclaw/workspace/highsolar/scraper/pending"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+LEADS_DIR = os.path.join(SCRIPT_DIR, "leads")
+PENDING_DIR = os.path.join(SCRIPT_DIR, "pending")
 
 GROUPS = [
     "1925997401002801",

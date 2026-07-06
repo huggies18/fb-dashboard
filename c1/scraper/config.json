@@ -18,8 +18,31 @@
         "ขอราคา"
     ],
     "min_comment_length": 10,
-    "max_scrolls": 25,
+    "min_scrolls": 4,
+    "max_scrolls": 15,
     "min_delay": 5,
     "max_delay": 15,
-    "headless": true
+    "headless": true,
+    "telegram_targets": [
+        {
+            "name": "Tibodin",
+            "chat_id": 6780942246,
+            "bot_token": "8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw"
+        },
+        {
+            "name": "Nick",
+            "chat_id": 8698062232,
+            "bot_token": "8774902841:AAFveLJDs-Bf02cPkBhZVPU5JBw_sdLIhNw"
+        },
+        {
+            "name": "Noty",
+            "chat_id": 6780942246,
+            "bot_token": "8641111669:AAEf倪9V_k_82gBScTPsp8yncksM5CE"
+        },
+        {
+            "name": "Kee",
+            "chat_id": 8868315905,
+            "bot_token": "8662942478:AAFAPhgEC4WI6lM6FCdsQKr7h_o0gbavPgw"
+        }
+    ]
 }

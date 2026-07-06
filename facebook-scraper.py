@@ -15,6 +15,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
 import time
 import json
 import os
@@ -41,8 +42,11 @@ def create_driver():
     chrome_options.add_argument("--disable-notifications")
     chrome_options.add_argument("--lang=th-TH")
     chrome_options.add_argument("--start-maximized")
-    
-    driver = webdriver.Chrome(options=chrome_options)
+    # Fix Chrome/ChromeDriver compatibility on newer versions
+    chrome_options.add_argument("--remote-allow-origins=*")
+
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
 def login_facebook(driver, email, password):

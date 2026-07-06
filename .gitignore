@@ -47,4 +47,5 @@ Thumbs.db
 !reference_*.jpg
 
 # Large files
-bot.log
+bot.logdashboard/.next/
+dashboard/node_modules/

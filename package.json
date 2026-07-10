@@ -1,0 +1,17 @@
+{
+  "name": "fb-dashboard-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": ["dashboard"],
+  "scripts": {
+    "install:dashboard": "cd dashboard && npm install",
+    "build": "cd dashboard && npm run build",
+    "dev": "cd dashboard && npm run dev",
+    "start": "cd dashboard && npm run start"
+  },
+  "dependencies": {
+    "next": "14.2.3",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  }
+}

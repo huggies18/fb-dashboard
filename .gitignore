@@ -49,3 +49,4 @@ Thumbs.db
 # Large files
 bot.logdashboard/.next/
 dashboard/node_modules/
+node_modules

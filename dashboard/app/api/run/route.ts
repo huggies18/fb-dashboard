@@ -1,24 +1,67 @@
-import { spawn } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 
 export const dynamic = 'force-dynamic';
+
+function getPythonInvocation() {
+  const candidates = process.platform === 'win32'
+    ? [
+        { command: 'py', args: ['-3'] },
+        { command: 'python', args: [] },
+        { command: 'python3', args: [] },
+      ]
+    : [
+        { command: 'python3', args: [] },
+        { command: 'python', args: [] },
+      ];
+
+  for (const candidate of candidates) {
+    const result = spawnSync(candidate.command, [...candidate.args, '--version'], { stdio: 'ignore' });
+    if (result.status === 0) {
+      return candidate;
+    }
+  }
+
+  return process.platform === 'win32'
+    ? { command: 'py', args: ['-3'] }
+    : { command: 'python3', args: [] };
+}
+
+function resolveScraperDir(company: string) {
+  const candidateRoots = [
+    process.cwd(),
+    path.resolve(process.cwd(), '..'),
+    path.resolve(process.cwd(), 'dashboard'),
+    path.resolve(process.cwd(), '..', 'dashboard'),
+    path.resolve(process.cwd(), '..', '..'),
+    path.resolve(process.cwd(), '..', '..', 'dashboard'),
+  ];
+
+  for (const candidateRoot of candidateRoots) {
+    const scraperDir = path.join(candidateRoot, company, 'scraper');
+    if (fs.existsSync(scraperDir)) {
+      return scraperDir;
+    }
+  }
+
+  return path.join(candidateRoots[0], company, 'scraper');
+}
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const company = searchParams.get('company') || 'highsolar';
   const target = searchParams.get('target') || 'Kee';
   
-  const rootDir = path.resolve(process.cwd(), '..');
-  const scraperDir = path.join(rootDir, company, 'scraper');
+  const scraperDir = resolveScraperDir(company);
+  const python = getPythonInvocation();
   
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     start(controller) {
       controller.enqueue(encoder.encode(`[SYSTEM] Starting workflow run for ${company} with target ${target}...\n`));
       
-      const pythonCommand = process.platform === 'win32' ? 'py' : 'python3';
-      const child = spawn(pythonCommand, ['run_workflow.py', target], {
+      const child = spawn(python.command, [...python.args, 'run_workflow.py', target], {
         cwd: scraperDir,
         env: { ...process.env, PYTHONUNBUFFERED: '1', PYTHONUTF8: '1' }
       });

@@ -1,0 +1,58 @@
+{
+  "leads": [
+    {
+      "url": "https://www.facebook.com/groups/242920475106307/posts/1013869504678063/",
+      "message": "หาแบต Huawei Luna 7kw มือสอง ครับ ib",
+      "group": "242920475106307",
+      "time": "2 วัน",
+      "scraped_at": "2026-07-10 09:29:51",
+      "score": 7,
+      "is_lead": true,
+      "reason": "ผู้ใช้ต้องการซื้อแบต Huawei Luna 7kW มือสอง แสดงถึงความต้องการซื้ออุปกรณ์โซลาร์เ"
+    }
+  ],
+  "not_leads": [
+    {
+      "url": "https://www.facebook.com/groups/thaisolarcell/posts/1358982949535100/",
+      "message": "ลองกิ 550วัต 1490 มารับเองที่โกดัง ร้อยเอ็ด",
+      "group": "163583739075033",
+      "time": "2 วัน",
+      "scraped_at": "2026-07-10 09:30:41",
+      "score": 0,
+      "is_lead": false,
+      "reason": "ผู้โพสต์กำลังขายแผงโซลาร์เซลล์ยี่ห้อลองกิ 550 วัตต์ ราคา 1490 บาท พร้อมให้มารับเ"
+    },
+    {
+      "url": "https://www.facebook.com/groups/383849116272497/posts/1723190145671714/",
+      "message": "เนื้อหานี้ไม่สามารถดูได้ในแคนาดา",
+      "group": "383849116272497",
+      "time": "16 ชั่วโมง",
+      "scraped_at": "2026-07-10 09:19:22",
+      "score": 0,
+      "is_lead": false,
+      "reason": "เนื้อหานี้ไม่เกี่ยวข้องกับการต้องการซื้อหรือติดตั้งโซลาร์เซลล์"
+    },
+    {
+      "url": "https://www.facebook.com/groups/264965324013436/posts/2462752570901356/",
+      "message": "Thaismart Power Technology Co.,Ltd. ผู้ผลิต ออกแบบ จำหน่ายและ OEM สินค้า BESS, ESS, PCS, EMS, Web/Mobile App.ภายใต้แบรนด์ TSPT Solarcell & BESS พร้อมทั้งให้ผลิตสินค้า S... ดูเพิ่มเติม",
+      "group": "264965324013436",
+      "time": "2 นาที",
+      "scraped_at": "2026-07-10 09:28:00",
+      "score": 0,
+      "is_lead": false,
+      "reason": "โพสต์เป็นข้อมูลสินค้าและบริการของผู้ผลิต/ผู้จำหน่าย ไม่ใช่ผู้ต้องการซื้อหรือติดต"
+    },
+    {
+      "url": "https://www.facebook.com/groups/185778725090915/posts/2856079541394140/",
+      "message": "Thaismart Power Technology Co.,Ltd. ผู้ผลิต ออกแบบ จำหน่ายและ OEM สินค้า BESS, ESS, PCS, EMS, Web/Mobile App.ภายใต้แบรนด์ TSPT Solarcell & BESS พร้อมทั้งให้ผลิตสินค้า S... ดูเพิ่มเติม",
+      "group": "185778725090915",
+      "time": "7 นาที",
+      "scraped_at": "2026-07-10 09:28:47",
+      "score": 0,
+      "is_lead": false,
+      "reason": "ผู้โพสต์เป็นบริษัทที่ผลิตและจำหน่ายอุปกรณ์ BESS, ESS, PCS และโซลาร์เซลล์ ซึ่งเป็"
+    }
+  ],
+  "total": 5,
+  "timestamp": "09:37:00"
+}
